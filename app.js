@@ -296,18 +296,32 @@ CRM.addProduct = async function(aCatalog, aName, aPurchase, aCurrency, aSurcharg
         })
     })
 }
-CRM.callBatch = async function(aMethod, aARGS){
+CRM.callBatchMain = async function(calls){
     return new Promise(function(resolve){
-        let calls = {}
-        let index = 0
-        for (let args of aARGS) {
-            calls[index] = [aMethod, args]
-            index++
-        }
-        BX24.callBatch(calls, function(result){
-            resolve(result)
+        BX24.callBatch(calls, function(aResult){
+            resolve(aResult)
         })
     })
+}
+CRM.callBatchSame = async function(aMethod, aARGS){
+    let result = {}
+    let calls = {}
+    let index = 0
+    for await (let args of aARGS) {
+        calls[index] = [aMethod, args]
+        index++
+        if (index === 49) {
+            index = 0
+            result = Object.assign({}, result, await CRM.callBatchMain(calls))
+            calls = {}
+        }
+    }
+    if (index > 0 && index < 49) {
+        index = 0
+        result = Object.assign({}, result, await CRM.callBatchMain(calls))
+        calls = {}
+    }
+    return result
 }
 
 
@@ -1019,8 +1033,6 @@ Goods.import = async function(aString){
 
     let catalogs = {}
     let rows = aString.split('\n')
-    
-    let result = {}
 
     let argsProductBatch = []
 
@@ -1030,11 +1042,6 @@ Goods.import = async function(aString){
         let type = row[0]
 
         if (type === 'catalog') {
-
-            if (argsProductBatch.length > 0) {
-                console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
-                argsProductBatch = []
-            }
 
             let catalog = catalogs[row[1]] || App.config.property.catalog.ID
             let name = row[2]
@@ -1079,11 +1086,10 @@ Goods.import = async function(aString){
     }
 
     if (argsProductBatch.length > 0) {
-        console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
-        argsProductBatch = []
+        console.log(await CRM.callBatchSame('crm.product.add', argsProductBatch))
     }
 
-    return result
+    return true
 
 }
 Goods.export = async function(){
