@@ -1,11 +1,8 @@
 (function($){
 
 $('.menu .item').tab()
-$('.ui .accordion').accordion({duration:0})
-$('.ui .dropdown').dropdown({duration:0, onChange:function(){
-        console.log(123136125365124365142534127534)
-    }
-})
+$('.ui .accordion').accordion({ duration:0 })
+$('.ui .dropdown').dropdown({ duration:0 })
 
 $('.ui .menu .item').on('click', function() {
     let element = $(this)
@@ -71,6 +68,15 @@ App.initialize = async function(){
             activeRow.removeClass('active')
         }
         element.addClass('active')
+    })
+
+    Elements.type6CategoryControl.dropdown({duration:0, onChange:function(){
+        console.log('type6category') 
+    }
+    })
+    Elements.type6GroupControl.dropdown({duration:0, onChange:function(){
+        console.log('type6Group')
+    }
     })
 
     // Elements.type6Category.dropdown('settings', 'onChange', function(value){
@@ -348,8 +354,11 @@ Elements.type5Note = Elements.type5Constructor.find('.controlNote')
 
 Elements.type6Constructor = $('#constructorType6').find('.controlCategory')
 Elements.type6Category = Elements.type6Constructor.find('.controlCategory')
+Elements.type6CategoryControl = Elements.type6Constructor.find('.controlCategory').parent()
 Elements.type6Group = Elements.type6Constructor.find('.controlGroup')
+Elements.type6GroupControl = Elements.type6Constructor.find('.controlGroup').parent()
 Elements.type6Goods = Elements.type6Constructor.find('.controlGoods')
+Elements.type6GoodsControl = Elements.type6Constructor.find('.controlGoods').parent()
 Elements.type6Count = Elements.type6Constructor.find('.controlCount')
 Elements.type6Note = Elements.type6Constructor.find('.controlNote')
 
