@@ -106,6 +106,7 @@ App.run = async function(){
     // check size frame application
     if (80 > (window.innerHeight / window.screen.availHeight)*100) {
         BX24.openApplication()
+        return
     }
 
     App.user = await CRM.getCurrentUser()
