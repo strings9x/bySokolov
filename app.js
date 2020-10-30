@@ -1062,7 +1062,7 @@ Goods.import = async function(aString){
 
             console.log('catalog', name)
 
-            await (new Promise(function(resolve){setTimeout(resolve, 150)}))
+            await (new Promise(function(resolve){setTimeout(resolve, 500)}))
 
         } else if (type === 'product') {
 
