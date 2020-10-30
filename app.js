@@ -1022,7 +1022,6 @@ Goods.import = async function(aString){
     
     let result = {}
 
-    let argsCatalogBatch = []
     let argsProductBatch = []
 
     for await (let item of rows) {
@@ -1049,7 +1048,7 @@ Goods.import = async function(aString){
             
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
 
-            console.log(name)
+            console.log('catalog', name)
 
         } else if (type === 'product') {
 
@@ -1063,18 +1062,21 @@ Goods.import = async function(aString){
             let grouping = row[8] || ''
             let title = row[9] || ''
             let record = recordImportRowToAddCRMProduct(catalog, name, purchase, currency, surcharge, destination, group, grouping, title)
-
+            
             argsProductBatch.push(record)
 
+            console.log('product', name)
+            
         }
 
-        await (new Promise(function(resolve){setTimeout(resolve, 100)}))
+        await (new Promise(function(resolve){setTimeout(resolve, 150)}))
 
     }
 
+    console.log(argsProductBatch)
+
     if (argsProductBatch.length > 0) {
         await CRM.callBatch('crm.product.add', argsProductBatch)
-        argsProductBatch = []
     }
 
     return result
