@@ -1050,6 +1050,8 @@ Goods.import = async function(aString){
 
             console.log('catalog', name)
 
+            await (new Promise(function(resolve){setTimeout(resolve, 150)}))
+
         } else if (type === 'product') {
 
             let catalog = catalogs[row[1]]
@@ -1066,17 +1068,13 @@ Goods.import = async function(aString){
             argsProductBatch.push(record)
 
             console.log('product', name)
-            
-        }
 
-        await (new Promise(function(resolve){setTimeout(resolve, 150)}))
+        }
 
     }
 
-    console.log(argsProductBatch)
-
     if (argsProductBatch.length > 0) {
-        await CRM.callBatch('crm.product.add', argsProductBatch)
+        console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
     }
 
     return result
