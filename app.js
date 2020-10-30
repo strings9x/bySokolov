@@ -106,6 +106,7 @@ App.run = async function(){
     // check size frame application
     if (80 > (window.innerHeight / window.screen.availHeight)*100) {
         BX24.openApplication()
+        return
     }
     App.user = await CRM.getCurrentUser()
     let listDeals = await CRM.getDealsList()
@@ -245,7 +246,7 @@ CRM.getProducts = async function(){
             } else {
                 array = array.concat(result.data())
                 if (result.more()) {
-                    await (new Promise((resolve)=>{ setTimeout(resolve, 100) }))
+                    await (new Promise((resolve)=>{ setTimeout(resolve, 150) }))
                     result.next()
                 } else {
                     resolve(array)
