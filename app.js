@@ -19,12 +19,13 @@ $('.ui .menu .item').on('click', function() {
 
 
 const type6CategoryChange = function(value, text){
-    console.log(value, text)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByDestination('type6Group'))
+    let catalog = Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex(`type6Group.${catalog.group}`))
 
 }
 const type6GroupChange = function(value, text){
-    console.log(value, text)
+    let catalog = Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex(`type6Group.${catalog.group}`))
 }
 
 
@@ -1029,11 +1030,6 @@ Goods.import = async function(aString){
 
         if (type === 'catalog') {
 
-            if (argsProductBatch.length > 0) {
-                await CRM.callBatch('crm.product.add', argsProductBatch)
-                argsProductBatch = []
-            }
-
             let catalog = catalogs[row[1]] || App.config.property.catalog.ID
             let name = row[2]
             let id = await CRM.addCatalog(catalog, name)
@@ -1116,6 +1112,8 @@ Goods.indexing = async function(items){
         }
         groupingValues.push(record)
 
+        // make unioun index
+
     }
 }
 
@@ -1130,6 +1128,9 @@ Goods.getGoodsByGroup = function(group){
 }
 Goods.getGoodsByGrouping = function(grouping){
     return Goods.indexes['grouping'][grouping]
+}
+Goods.getGoodsByIndex = function(name){
+    return Goods.indexes['WHAT'][name]
 }
 
 
