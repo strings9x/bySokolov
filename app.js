@@ -2,7 +2,10 @@
 
 $('.menu .item').tab()
 $('.ui .accordion').accordion({duration:0})
-$('.ui .dropdown').dropdown({duration:0})
+$('.ui .dropdown').dropdown({duration:0, onChange:function(){
+        console.log(123136125365124365142534127534)
+    }
+})
 
 $('.ui .menu .item').on('click', function() {
     let element = $(this)
@@ -70,12 +73,15 @@ App.initialize = async function(){
         element.addClass('active')
     })
 
-    Elements.type6Category.dropdown('settings', 'onChange', function(value){
-        console.log('change combobox', 'type6Group', value)
-    })
-    Elements.type6Group.dropdown('settings', 'onChange', function(value){
-        console.log('change combobox', 'type6Group', value)
-    })
+    // Elements.type6Category.dropdown('settings', 'onChange', function(value){
+    //     console.log('change combobox', 'type6Group', value)
+    //     // Goods.getGoodsById(value)
+    //     // Helper.listSetItems(Elements.type6Group, Goods.getGoodsByDestination('type6Group'))
+    // })
+    // Elements.type6Group.dropdown('settings', 'onChange', function(value){
+    //     console.log('change combobox', 'type6Group', value)
+    //     // Helper.listSetItems(Elements.type6Goods, Goods.getGoodsByDestination('type6Goods'))
+    // })
     
 
     BX24.init(App.run)
@@ -340,7 +346,7 @@ Elements.type5Width = Elements.type5Constructor.find('.controlWidth')
 Elements.type5Count = Elements.type5Constructor.find('.controlCount')
 Elements.type5Note = Elements.type5Constructor.find('.controlNote')
 
-Elements.type6Constructor = $('#constructorType6')
+Elements.type6Constructor = $('#constructorType6').find('.controlCategory')
 Elements.type6Category = Elements.type6Constructor.find('.controlCategory')
 Elements.type6Group = Elements.type6Constructor.find('.controlGroup')
 Elements.type6Goods = Elements.type6Constructor.find('.controlGoods')
