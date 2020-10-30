@@ -102,6 +102,7 @@ App.initialize = async function(){
     
 }
 App.run = async function(){
+    console.log('application run')
     // check size frame application
     if (80 > (window.innerHeight / window.screen.availHeight)*100) {
         BX24.openApplication()
@@ -233,7 +234,7 @@ CRM.getCurrentUser = function(){
 CRM.getProducts = async function(){
     return new Promise(function(resolve, reject){
         let order = { 'NAME':'ASC' }
-        let filter = { 'CATALOG_ID': App.config.property.catalog.ID }
+        let filter = { 'CATALOG_ID':App.config.property.catalog.ID }
         let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
         var config = { order, filter, select }
         let array = []
