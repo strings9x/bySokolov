@@ -997,7 +997,7 @@ const recordImportRowToAddCRMProduct = function(aCatalog, aName, aPurchase, aCur
     let fields = {
         SORT:500,
         NAME:aName,
-        SECTION_ID:aCatalog,
+        SECTION_ID:aCatalog
     }
     fields[`PROPERTY_${App.config.property.goods.PURCHASE}`] = { value:aPurchase || '' }
     fields[`PROPERTY_${App.config.property.goods.CURRENCY}`] = { value:aCurrency || '' }
@@ -1046,6 +1046,8 @@ Goods.import = async function(aString){
             let title = row[9] || name
             
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
+            
+            console.log(name)
 
         } else if (type === 'product') {
 
