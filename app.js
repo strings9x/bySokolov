@@ -69,6 +69,13 @@ App.initialize = async function(){
         }
         element.addClass('active')
     })
+
+    Elements.type6Category.dropdown('settings', 'onChange', function(value){
+        console.log('change combobox', 'type6Group', value)
+    })
+    Elements.type6Group.dropdown('settings', 'onChange', function(value){
+        console.log('change combobox', 'type6Group', value)
+    })
     
 
     BX24.init(App.run)
@@ -87,6 +94,7 @@ App.run = async function(){
     
 
     Helper.listSetItems(Elements.type4Goods, Goods.getGoodsByDestination('type4Goods'))
+    Helper.listSetItems(Elements.type6Category, Goods.getGoodsByDestination('type6Category'))
 }
 
 
