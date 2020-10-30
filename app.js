@@ -20,7 +20,8 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = function(value, text){
     console.log(value, text)
-    
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByDestination('type6Group'))
+
 }
 const type6GroupChange = function(value, text){
     console.log(value, text)
@@ -1043,9 +1044,9 @@ Goods.import = async function(aString){
             let purchase = `${row[3].replace(',', '.')}`
             let currency = `${row[4]}`
             let surcharge = `${row[5].replace(',', '.')}`
-            let destination = `${row[6]}`
-            let group = `${row[7]}`
-            let grouping = `${row[8]}`
+            let destination = `${row[6]}` || ''
+            let group = `${row[7]}` || ''
+            let grouping = `${row[8]}` || ''
             let title = `${row[9]}` || name
             
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
@@ -1057,10 +1058,10 @@ Goods.import = async function(aString){
             let purchase = `${row[3].replace(',', '.')}`
             let currency = `${row[4]}`
             let surcharge = `${row[5].replace(',', '.')}`
-            let destination = `${row[6]}`
-            let group = `${row[7]}`
-            let grouping = `${row[8]}`
-            let title = `${row[9]}`
+            let destination = `${row[6]}` || ''
+            let group = `${row[7]}` || ''
+            let grouping = `${row[8]}` || ''
+            let title = `${row[9]}` || ''
             let record = recordImportRowToAddCRMProduct(catalog, name, purchase, currency, surcharge, destination, group, grouping, title)
 
             argsProductBatch.push(record)
