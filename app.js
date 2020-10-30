@@ -18,11 +18,12 @@ $('.ui .menu .item').on('click', function() {
 
 
 
-const type6CategoryChange = function(){
-    console.log('type6Category')
+const type6CategoryChange = function(value, text){
+    console.log(value, text)
+    
 }
-const type6GroupChange = function(){
-    console.log('type6Group')
+const type6GroupChange = function(value, text){
+    console.log(value, text)
 }
 
 
