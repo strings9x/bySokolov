@@ -1033,6 +1033,7 @@ Goods.import = async function(aString){
 
             if (argsProductBatch.length > 0) {
                 console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
+                argsProductBatch = []
             }
 
             let catalog = catalogs[row[1]] || App.config.property.catalog.ID
@@ -1079,6 +1080,7 @@ Goods.import = async function(aString){
 
     if (argsProductBatch.length > 0) {
         console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
+        argsProductBatch = []
     }
 
     return result
