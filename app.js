@@ -25,7 +25,7 @@ const type6CategoryChange = function(value, text){
 }
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex(`type6Group.${catalog.group}`))
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex(`type6Goods.${catalog.grouping}`))
 }
 
 
@@ -106,8 +106,8 @@ App.run = async function(){
     // check size frame application
     if (80 > (window.innerHeight / window.screen.availHeight)*100) {
         BX24.openApplication()
-        return
     }
+
     App.user = await CRM.getCurrentUser()
     let listDeals = await CRM.getDealsList()
     Renders.tableDeals(listDeals || [])
@@ -237,7 +237,7 @@ CRM.getProducts = async function(){
         let order = { 'NAME':'ASC' }
         let filter = { 'CATALOG_ID':App.config.property.catalog.ID }
         let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
-        var config = { order, filter, select }
+        let config = { order, filter, select, start:-1 }
         let array = []
         BX24.callMethod('crm.product.list', config, async function(result){
             if (result.error()) {
@@ -246,7 +246,7 @@ CRM.getProducts = async function(){
             } else {
                 array = array.concat(result.data())
                 if (result.more()) {
-                    await (new Promise((resolve)=>{ setTimeout(resolve, 150) }))
+                    //await (new Promise((resolve)=>{ setTimeout(resolve, 150) }))
                     result.next()
                 } else {
                     resolve(array)
@@ -1109,6 +1109,9 @@ Goods.indexing = async function(items){
     let groupIndex = Goods.indexes['group'] = {}
     let groupingIndex = Goods.indexes['grouping'] = {}
 
+    let indexDestinationGroup = Goods.indexes['destination.group'] = {}
+    let indexDestinationGrouping = Goods.indexes['destination.grouping'] = {}
+
     for (let item of items) {
 
         let record = Helper.recordCRMProduct(item)
@@ -1134,6 +1137,17 @@ Goods.indexing = async function(items){
         groupingValues.push(record)
 
         // make unioun index
+        let valuesDestinationGroup = Index[`${record.destination}.${record.group}`]
+        if (!valuesDestinationGroup) {
+            valuesDestinationGroup = Index[`${record.destination}.${record.group}`] = []
+        }
+        valuesDestinationGroup.push(record)
+
+        let valuesDestinationGrouping = Index[`${record.destination}.${record.grouping}`]
+        if (!valuesDestinationGrouping) {
+            valuesDestinationGrouping = Index[`${record.destination}.${record.grouping}`] = []
+        }
+        valuesDestinationGrouping.push(record)
 
     }
 }
@@ -1150,8 +1164,8 @@ Goods.getGoodsByGroup = function(group){
 Goods.getGoodsByGrouping = function(grouping){
     return Goods.indexes['grouping'][grouping]
 }
-Goods.getGoodsByIndex = function(name){
-    return Goods.indexes['WHAT'][name]
+Goods.getGoodsByIndex = function(name, value){
+    return Goods.indexes[name][value]
 }
 
 
