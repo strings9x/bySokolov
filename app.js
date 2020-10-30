@@ -1021,10 +1021,12 @@ Goods.import = async function(aString){
     let rows = aString.split('\n')
     
     let result = {}
+
     let argsCatalogBatch = []
     let argsProductBatch = []
 
     for await (let item of rows) {
+
         let row = item.split('\t')
         let type = row[0]
 
@@ -1046,7 +1048,7 @@ Goods.import = async function(aString){
             let title = row[9] || name
             
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
-            
+
             console.log(name)
 
         } else if (type === 'product') {
@@ -1065,6 +1067,8 @@ Goods.import = async function(aString){
             argsProductBatch.push(record)
 
         }
+
+        await (new Promise(function(resolve){setTimeout(resolve, 100)}))
 
     }
 
