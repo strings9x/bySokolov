@@ -238,13 +238,14 @@ CRM.getProducts = async function(){
         let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
         var config = { order, filter, select }
         let array = []
-        BX24.callMethod('crm.product.list', config, function(result){
+        BX24.callMethod('crm.product.list', config, async function(result){
             if (result.error()) {
                 console.error(result.error())
                 resolve({})
             } else {
                 array = array.concat(result.data())
                 if (result.more()) {
+                    await (new Promise((resolve)=>{ setTimeout(resolve, 100) }))
                     result.next()
                 } else {
                     resolve(array)
