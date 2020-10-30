@@ -20,12 +20,12 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex(`type6Group.${catalog.group}`))
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex('destination.group', `type6Group.${catalog.group}`))
 
 }
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex(`type6Goods.${catalog.grouping}`))
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.grouping}`))
 }
 
 
@@ -1137,15 +1137,15 @@ Goods.indexing = async function(items){
         groupingValues.push(record)
 
         // make unioun index
-        let valuesDestinationGroup = Index[`${record.destination}.${record.group}`]
+        let valuesDestinationGroup = indexDestinationGroup[`${record.destination}.${record.group}`]
         if (!valuesDestinationGroup) {
-            valuesDestinationGroup = Index[`${record.destination}.${record.group}`] = []
+            valuesDestinationGroup = indexDestinationGroup[`${record.destination}.${record.group}`] = []
         }
         valuesDestinationGroup.push(record)
 
-        let valuesDestinationGrouping = Index[`${record.destination}.${record.grouping}`]
+        let valuesDestinationGrouping = indexDestinationGrouping[`${record.destination}.${record.grouping}`]
         if (!valuesDestinationGrouping) {
-            valuesDestinationGrouping = Index[`${record.destination}.${record.grouping}`] = []
+            valuesDestinationGrouping = indexDestinationGrouping[`${record.destination}.${record.grouping}`] = []
         }
         valuesDestinationGrouping.push(record)
 
