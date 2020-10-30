@@ -1031,6 +1031,10 @@ Goods.import = async function(aString){
 
         if (type === 'catalog') {
 
+            if (argsProductBatch.length > 0) {
+                console.log(await CRM.callBatch('crm.product.add', argsProductBatch))
+            }
+
             let catalog = catalogs[row[1]] || App.config.property.catalog.ID
             let name = row[2]
             let id = await CRM.addCatalog(catalog, name)
