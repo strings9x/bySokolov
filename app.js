@@ -1041,13 +1041,13 @@ Goods.import = async function(aString){
             catalogs[name] = id
 
             // @catalog
-            let purchase = `${row[3].replace(',', '.')}`
-            let currency = `${row[4]}`
-            let surcharge = `${row[5].replace(',', '.')}`
-            let destination = `${row[6]}` || ''
-            let group = `${row[7]}` || ''
-            let grouping = `${row[8]}` || ''
-            let title = `${row[9]}` || name
+            let purchase = (row[3] || '').replace(',', '.')
+            let currency = row[4]
+            let surcharge = (row[5] || '').replace(',', '.')
+            let destination = row[6] || ''
+            let group = row[7] || ''
+            let grouping = row[8] || ''
+            let title = row[9] || name
             
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
 
@@ -1055,13 +1055,13 @@ Goods.import = async function(aString){
 
             let catalog = catalogs[row[1]]
             let name = row[2]
-            let purchase = `${row[3].replace(',', '.')}`
-            let currency = `${row[4]}`
-            let surcharge = `${row[5].replace(',', '.')}`
-            let destination = `${row[6]}` || ''
-            let group = `${row[7]}` || ''
-            let grouping = `${row[8]}` || ''
-            let title = `${row[9]}` || ''
+            let purchase = (row[3] || '').replace(',', '.')
+            let currency = row[4]
+            let surcharge = (row[5] || '').replace(',', '.')
+            let destination = row[6] || ''
+            let group = row[7] || ''
+            let grouping = row[8] || ''
+            let title = row[9] || ''
             let record = recordImportRowToAddCRMProduct(catalog, name, purchase, currency, surcharge, destination, group, grouping, title)
 
             argsProductBatch.push(record)
