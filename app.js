@@ -70,13 +70,15 @@ App.initialize = async function(){
         element.addClass('active')
     })
 
-    Elements.type6CategoryControl.dropdown({duration:0, onChange:function(){
-        console.log('type6category') 
-    }
+    Elements.type6CategoryControl.dropdown({ duration:0,
+        onChange:function(){
+            console.log('type6category')
+        }
     })
-    Elements.type6GroupControl.dropdown({duration:0, onChange:function(){
-        console.log('type6Group')
-    }
+    Elements.type6GroupControl.dropdown({ duration:0,
+        onChange:function(){
+            console.log('type6category')
+        }
     })
 
     // Elements.type6Category.dropdown('settings', 'onChange', function(value){
@@ -304,7 +306,7 @@ CRM.callBatch = async function(aMethod, aARGS){
 
 
 
-const Elements = {}
+const Elements = App.Elements = {}
 Elements.HIDDEN_CONTROLS = $('#HIDDEN_CONTROLS')
 Elements.buttonNewOrder = $('#buttonNewOrder')
 Elements.tableDeals = $('#tableDeals')
@@ -374,7 +376,7 @@ Elements.type7Note = Elements.type7Constructor.find('.controlNote')
 
 
 // UI Renders
-const Renders = {}
+const Renders = App.Renders = {}
 Renders.UIElementError = function(){
     // red
 }
@@ -463,7 +465,7 @@ Renders.tableDealItems = function(items){
 }
 
 // FrameDeal
-const FrameDeal = {}
+const FrameDeal = App.FrameDeal = {}
 FrameDeal.open = async function(ID){
     Deal.ID = ID
     let result = await Deal.dataGet()
@@ -486,7 +488,7 @@ FrameDeal.close = async function(){
 }
 
 // Deal
-const Deal = {}
+const Deal = App.Deal = {}
 Deal.ID = 0
 Deal.BXRecord = null
 Deal.ORIGIN = '{}'
@@ -665,7 +667,7 @@ Deal.setCurrentBill = function(aBill){
 }
 
 // Constructor
-let Constructor = {}
+let Constructor = App.Constructor = {}
 Constructor.currentType = ''
 Constructor.element = $('#constructor')
 Constructor.visible = function(args){
