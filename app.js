@@ -93,11 +93,11 @@ App.initialize = async function(){
     // Elements.type6Category.dropdown('settings', 'onChange', function(value){
     //     console.log('change combobox', 'type6Group', value)
     //     // Goods.getGoodsById(value)
-    //     // Helper.listSetItems(Elements.type6Group, Goods.getGoodsByDestination('type6Group'))
+    //     // Helper.listSetItems(Elements.type6Group, await Goods.getGoodsByDestination('type6Group'))
     // })
     // Elements.type6Group.dropdown('settings', 'onChange', function(value){
     //     console.log('change combobox', 'type6Group', value)
-    //     // Helper.listSetItems(Elements.type6Goods, Goods.getGoodsByDestination('type6Goods'))
+    //     // Helper.listSetItems(Elements.type6Goods, await Goods.getGoodsByDestination('type6Goods'))
     // })
     
 
@@ -119,8 +119,8 @@ App.run = async function(){
     //await Goods.indexing(await CRM.getProducts())
     
 
-    Helper.listSetItems(Elements.type4Goods, Goods.getGoodsByDestination('type4Goods'))
-    Helper.listSetItems(Elements.type6Category, Goods.getGoodsByDestination('type6Category'))
+    Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
+    Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
 }
 
 
@@ -1260,7 +1260,7 @@ Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
 
 
 // deprecated
-Goods.getGoodsByDestination = function(aDestination){
+Goods.getGoodsByDestination = async function(aDestination){
     let goods = Goods.getGoodsByIndex('destination', aDestination)
     if (!goods) {
         goods = await CRM.getProductsFilterByD(aDestination)
