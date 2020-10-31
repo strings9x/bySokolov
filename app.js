@@ -20,11 +20,14 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
+    console.log(catalog)
     Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex('destination.grouping', `type6Group.${catalog.group}`))
+
 }
 
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
+    console.log(catalog)
     Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.group}`))
 }
 
@@ -131,12 +134,12 @@ const Helper = window.Helper = {}
 Helper.recordCRMProduct = function(item){
     let id = item['ID']
     let name = item['NAME']
-    let purchase = item[`PROPERTY_${App.config.property.goods.PURCHASE}`]?.value
-    let currency = item[`PROPERTY_${App.config.property.goods.CURRENCY}`]?.value
-    let surcharge = item[`PROPERTY_${App.config.property.goods.SURCHARGE}`]?.value
-    let destination = item[`PROPERTY_${App.config.property.goods.DESTINATION}`]?.value
-    let group = item[`PROPERTY_${App.config.property.goods.GROUP}`]?.value
-    let grouping = item[`PROPERTY_${App.config.property.goods.GROUPING}`]?.value
+    let purchase = item[`PROPERTY_${App.config.property.goods.PURCHASE}`]?.value || ''
+    let currency = item[`PROPERTY_${App.config.property.goods.CURRENCY}`]?.value || ''
+    let surcharge = item[`PROPERTY_${App.config.property.goods.SURCHARGE}`]?.value || ''
+    let destination = item[`PROPERTY_${App.config.property.goods.DESTINATION}`]?.value || ''
+    let group = item[`PROPERTY_${App.config.property.goods.GROUP}`]?.value || ''
+    let grouping = item[`PROPERTY_${App.config.property.goods.GROUPING}`]?.value || ''
     let title = item[`PROPERTY_${App.config.property.goods.TITLE}`]?.value || name
     return { id, name, purchase, currency, surcharge, destination, group, grouping, title }
 }
