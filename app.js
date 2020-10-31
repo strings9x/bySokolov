@@ -275,6 +275,32 @@ CRM.getProductById = async function(aId){
         );
     })
 }
+CRM.getProductsFilterByDGG = async function(aDestination){
+    return new Promise(function(resolve){
+
+        let order = { 'NAME': 'ASC' }
+        let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
+            filter[`?PROPERTY_${App.config.property.goods.DESTINATION}`] = aDestination
+        let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
+        let args = { order, filter, select }
+
+        let array = []
+
+        BX24.callMethod('crm.product.list', args, async function(result){
+            if (result.error()) {
+                console.error(result.error())
+                resolve()
+            } else {
+                array = array.concat(result.data())
+                if (result.more()) {
+                    result.next()
+                } else {
+                    resolve(array)
+                }
+            }
+        })
+    })
+}
 CRM.getProductsFilterByDGG = async function(aDestination, aGroup, aGrouping){
     return new Promise(function(resolve){
 
@@ -1170,7 +1196,9 @@ Goods.indexing = async function(items){
 
         let record = Helper.recordCRMProduct(item)
 
-        idIndex[record.id] = record
+        if (idIndex[record.id]) {
+            return
+        }
 
         let destinationValues = destinationIndex[record.destination]
         if (!destinationValues) {
@@ -1232,8 +1260,15 @@ Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
 
 
 // deprecated
-Goods.getGoodsByDestination = function(destination){
-    return Goods.indexes['destination']?.[destination]
+Goods.getGoodsByDestination = function(aDestination){
+    let goods = Goods.getGoodsByIndex('destination', aDestination)
+    if (!goods) {
+        goods = await CRM.getProductsFilterByD(aDestination)
+        if (goods) {
+            Goods.indexing(goods)
+        }
+    }
+    return goods || []
 }
 Goods.getGoodsByGroup = function(group){
     return Goods.indexes['group']?.[group]
