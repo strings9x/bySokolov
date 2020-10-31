@@ -845,7 +845,7 @@ Constructor.visible = function(args){
 
 }
 
-Constructor.getRecord = function(){
+Constructor.getRecord = async function(){
     let type = Constructor.currentType.replace('constructorT', 't')
     let handler = Constructor[`${type}DataManage`]
     if (typeof handler !== 'function') {
@@ -855,7 +855,7 @@ Constructor.getRecord = function(){
     console.log('getRecord', record)
     return { ...record, type }
 }
-Constructor.setRecord = function(aRecord){
+Constructor.setRecord = async function(aRecord){
     let { type } = aRecord
     type = type.replace('t', 'constructorT')
     Constructor.visible({ type })
@@ -1035,7 +1035,7 @@ const listConstructorsClick = function(event){
 
 const btnConstructorAddItemClick = function(event){
     let bill = Deal.getCurrentBill()
-    let record = Constructor.getRecord()
+    let record = await Constructor.getRecord()
     if (!record) {
         alert('ошибка добавления данных')
     }
@@ -1046,7 +1046,7 @@ const btnConstructorAddItemClick = function(event){
 const btnConstructorChangeItemClick = function(event){
     let index = TableDealItems.selectIndex
     let bill = Deal.getCurrentBill()
-    let record = Constructor.getRecord()
+    let record = await Constructor.getRecord()
     if (!record) {
         alert('ошибка добавления данных')
     }
@@ -1130,7 +1130,7 @@ TableDealItems.element.on('dblclick', function(event){
     let index = Elements.tableDealItems.find('.active').attr('data-item-index')
     let bill = Deal.getCurrentBill()
     let item = bill.items[index]
-    Constructor.setRecord(item)
+    await Constructor.setRecord(item)
 })
 
 
