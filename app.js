@@ -1255,8 +1255,8 @@ Goods.indexing = async function(items){
     let indexDestinationGrouping = Goods.indexes['destination.grouping'] || ( Goods.indexes['destination.grouping'] = {} )
 
     console.log(items)
-    if (!Array.isArray(items)) {
-        return
+    if (!Array.isArray(items) && typeof items === 'object') {
+        items = [items]
     }
 
 
