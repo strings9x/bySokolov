@@ -984,31 +984,31 @@ Constructor.type7DataManage = async function(aRecord){
 }
 
 Constructor.type1Calculate = function(record){
-    return Number( -1 ).toFixed(3).ceil().toFixed(2)
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type2Calculate = function(record){
-    return Number( -1 ).toFixed(3).ceil().toFixed(2)
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type3Calculate = function(record){
-    return Number( -1 ).toFixed(3).ceil().toFixed(2)
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type4Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return Number( ( purchase * count ) * surcharge ).toFixed(3).ceil().toFixed(2)
+    return Number( ( purchase * count ) * surcharge ).toFixed(2)
 }
 Constructor.type5Calculate = function(record){
     let { count, price, width, height } = record
-    return Number( ( ( ( width * height ) * price ) * count ) ).toFixed(3).ceil().toFixed(2)
+    return Number( ( ( ( width * height ) * price ) * count ) ).toFixed(2)
 }
 Constructor.type6Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return Number( ( purchase * count ) * surcharge ).toFixed(3).ceil().toFixed(2)
+    return Number( ( purchase * count ) * surcharge ).toFixed(2)
 }
 Constructor.type7Calculate = function(record){
     let { count, price } = record
-    return Number( ( price * count ) ).toFixed(3).ceil().toFixed(2)
+    return Number( ( price * count ) ).toFixed(2)
 }
 
 // LIST_CONSTRUCTORS
