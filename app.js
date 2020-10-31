@@ -275,7 +275,7 @@ CRM.getProductById = async function(aId){
         );
     })
 }
-CRM.getProductsFilterByDGG = async function(aDestination){
+CRM.getProductsFilterByD = async function(aDestination){
     return new Promise(function(resolve){
 
         let order = { 'NAME': 'ASC' }
