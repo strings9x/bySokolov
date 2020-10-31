@@ -1240,6 +1240,7 @@ Goods.getGoodsById = async function(id){
         goods = await CRM.getProductById(id)
         if (goods) {
             Goods.indexing(goods)
+            goods = Goods.indexes['id'][id]
         }
     }
     return goods || null
@@ -1251,6 +1252,7 @@ Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
         goods = await CRM.getProductsFilterByDGG(aDestination, aGroup, aGrouping)
         if (goods) {
             Goods.indexing(goods)
+            goods = Goods.getGoodsByIndex('destination.group.grouping', `${aDestination}.${aGroup}.${aGrouping}`)
         }
     }
     return goods || []
@@ -1266,6 +1268,7 @@ Goods.getGoodsByDestination = async function(aDestination){
         goods = await CRM.getProductsFilterByD(aDestination)
         if (goods) {
             Goods.indexing(goods)
+            goods = Goods.getGoodsByIndex('destination', aDestination)
         }
     }
     return goods || []
