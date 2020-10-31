@@ -21,14 +21,13 @@ $('.ui .menu .item').on('click', function() {
 const type6CategoryChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
     console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByIndex('destination.grouping', `type6Group.${catalog.group}`))
-
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByFilterDGroup('type6Group', catalog.group))
 }
 
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
     console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.group}`))
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByFilterDGGroup('type6Goods', catalog.group)) //stination.grouping', `type6Goods.${catalog.group}`))
 }
 
 
@@ -281,6 +280,60 @@ CRM.getProductsFilterByD = async function(aDestination){
         let order = { 'NAME': 'ASC' }
         let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
             filter[`?PROPERTY_${App.config.property.goods.DESTINATION}`] = aDestination
+        let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
+        let args = { order, filter, select }
+
+        let array = []
+
+        BX24.callMethod('crm.product.list', args, async function(result){
+            if (result.error()) {
+                console.error(result.error())
+                resolve()
+            } else {
+                array = array.concat(result.data())
+                if (result.more()) {
+                    result.next()
+                } else {
+                    resolve(array)
+                }
+            }
+        })
+    })
+}
+CRM.getProductsFilterByDGroup = async function(aDestination, aGroup){
+    return new Promise(function(resolve){
+
+        let order = { 'NAME': 'ASC' }
+        let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
+            filter[`?PROPERTY_${App.config.property.goods.DESTINATION}`] = aDestination
+            filter[`?PROPERTY_${App.config.property.goods.GROUP}`] = aGroup
+        let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
+        let args = { order, filter, select }
+
+        let array = []
+
+        BX24.callMethod('crm.product.list', args, async function(result){
+            if (result.error()) {
+                console.error(result.error())
+                resolve()
+            } else {
+                array = array.concat(result.data())
+                if (result.more()) {
+                    result.next()
+                } else {
+                    resolve(array)
+                }
+            }
+        })
+    })
+}
+CRM.getProductsFilterByDGrouping = async function(aDestination, aGrouping){
+    return new Promise(function(resolve){
+
+        let order = { 'NAME': 'ASC' }
+        let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
+            filter[`?PROPERTY_${App.config.property.goods.DESTINATION}`] = aDestination
+            filter[`?PROPERTY_${App.config.property.goods.GROUPING}`] = aGrouping
         let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
         let args = { order, filter, select }
 
@@ -1244,6 +1297,42 @@ Goods.getGoodsById = async function(id){
         }
     }
     return goods || null
+}
+Goods.getGoodsByFilterD = async function(aDestination){
+    let goods = Goods.getGoodsByIndex('destination', `${aDestination}`)
+    console.log(goods)
+    if (!goods) {
+        goods = await CRM.getProductsFilterByD(aDestination)
+        if (goods) {
+            Goods.indexing(goods)
+            goods = Goods.getGoodsByIndex('destination', `${aDestination}`)
+        }
+    }
+    return goods || []
+}
+Goods.getGoodsByFilterDGroup = async function(aDestination, aGroup){
+    let goods = Goods.getGoodsByIndex('destination.group', `${aDestination}.${aGroup}`)
+    console.log(goods)
+    if (!goods) {
+        goods = await CRM.getProductsFilterByDGroup(aDestination, aGroup)
+        if (goods) {
+            Goods.indexing(goods)
+            goods = Goods.getGoodsByIndex('destination.group', `${aDestination}.${aGroup}`)
+        }
+    }
+    return goods || []
+}
+Goods.getGoodsByFilterDGrouping = async function(aDestination, aGrouping){
+    let goods = Goods.getGoodsByIndex('destination.grouping', `${aDestination}.${aGrouping}`)
+    console.log(goods)
+    if (!goods) {
+        goods = await CRM.getProductsFilterByDGrouping(aDestination, aGrouping)
+        if (goods) {
+            Goods.indexing(goods)
+            goods = Goods.getGoodsByIndex('destination.grouping', `${aDestination}.${aGrouping}`)
+        }
+    }
+    return goods || []
 }
 Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
     let goods = Goods.getGoodsByIndex('destination.group.grouping', `${aDestination}.${aGroup}.${aGrouping}`)
