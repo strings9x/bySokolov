@@ -1233,16 +1233,16 @@ Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
 
 // deprecated
 Goods.getGoodsByDestination = function(destination){
-    return Goods.indexes['destination'][destination]
+    return Goods.indexes['destination']?.[destination]
 }
 Goods.getGoodsByGroup = function(group){
-    return Goods.indexes['group'][group]
+    return Goods.indexes['group']?.[group]
 }
 Goods.getGoodsByGrouping = function(grouping){
-    return Goods.indexes['grouping'][grouping]
+    return Goods.indexes['grouping']?.[grouping]
 }
 Goods.getGoodsByIndex = function(name, value){
-    return Goods.indexes[name][value]
+    return Goods.indexes[name]?.[value]
 }
 
 
