@@ -20,12 +20,12 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex('destination.group', `type6Group.${catalog.group}`))
-
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex('destination.grouping', `type6Group.${catalog.group}`))
 }
+
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.grouping}`))
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.group}`))
 }
 
 
