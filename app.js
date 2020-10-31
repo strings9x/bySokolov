@@ -24,7 +24,7 @@ const type6CategoryChange = async function(value, text){
     if (!item) {
         return
     }
-    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGroup('type6Group', item.group))
+    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item.group))
 }
 
 const type6GroupChange = async function(value, text){
@@ -33,7 +33,7 @@ const type6GroupChange = async function(value, text){
     if (!item) {
         return
     }
-    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGroup('type6Goods', item.group))
+    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item.group))
 }
 
 
