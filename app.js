@@ -18,14 +18,14 @@ $('.ui .menu .item').on('click', function() {
 
 
 
-const type6CategoryChange = function(value, text){
+const type6CategoryChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByFilterDGroup('type6Group', item.group))
+    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGroup('type6Group', item.group))
 }
 
-const type6GroupChange = function(value, text){
+const type6GroupChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByFilterDGGroup('type6Goods', item.group))
+    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGroup('type6Goods', item.group))
 }
 
 
@@ -623,7 +623,7 @@ FrameDeal.open = async function(ID){
 
         Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
         Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
-        
+
         Renders.dealDataWrite()
         $('.ui.modal').modal({duration:0}).modal('show')
     } else {
