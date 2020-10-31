@@ -1026,14 +1026,14 @@ Constructor.type7Calculate = function(record){
 }
 
 // LIST_CONSTRUCTORS
-const listConstructorsClick = function(event){
+const listConstructorsClick = async function(event){
     let { target } = event
     let element = $(target)
     let type = element.attr('constructor-type')
     Constructor.visible({ type })
 }
 
-const btnConstructorAddItemClick = function(event){
+const btnConstructorAddItemClick = async function(event){
     let bill = Deal.getCurrentBill()
     let record = await Constructor.getRecord()
     if (!record) {
@@ -1043,7 +1043,7 @@ const btnConstructorAddItemClick = function(event){
     Deal.setCurrentBill(bill)
     Renders.tableDealItems(bill.items)
 }
-const btnConstructorChangeItemClick = function(event){
+const btnConstructorChangeItemClick = async function(event){
     let index = TableDealItems.selectIndex
     let bill = Deal.getCurrentBill()
     let record = await Constructor.getRecord()
@@ -1055,7 +1055,7 @@ const btnConstructorChangeItemClick = function(event){
     Renders.tableDealItems(bill.items)
 }
 
-const btnRemoveSelectDealItemClick = function(event){
+const btnRemoveSelectDealItemClick = async function(event){
     console.log('remove dealitem btn click', event)
     event.stopPropagation()
     Elements.HIDDEN_CONTROLS.append(Elements.btnRemoveSelectDealItem)
@@ -1126,7 +1126,7 @@ TableDealItems.element.on('click', function(event){
     element.addClass('active').find('.controls').append(Elements.btnRemoveSelectDealItem)
 })
 
-TableDealItems.element.on('dblclick', function(event){
+TableDealItems.element.on('dblclick', async function(event){
     let index = Elements.tableDealItems.find('.active').attr('data-item-index')
     let bill = Deal.getCurrentBill()
     let item = bill.items[index]
