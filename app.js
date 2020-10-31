@@ -20,20 +20,12 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    console.log(item)
-    if (!item) {
-        return
-    }
-    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item.group))
+    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item?.group))
 }
 
 const type6GroupChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    console.log(item)
-    if (!item) {
-        return
-    }
-    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item.group))
+    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item?.group))
 }
 
 
@@ -94,36 +86,22 @@ App.initialize = async function(){
 
     $('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
     $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
-
-    // Elements.type6Category.dropdown('settings', 'onChange', function(value){
-    //     console.log('change combobox', 'type6Group', value)
-    //     // Goods.getGoodsById(value)
-    //     // Helper.listSetItems(Elements.type6Group, await Goods.getGoodsByDestination('type6Group'))
-    // })
-    // Elements.type6Group.dropdown('settings', 'onChange', function(value){
-    //     console.log('change combobox', 'type6Group', value)
-    //     // Helper.listSetItems(Elements.type6Goods, await Goods.getGoodsByDestination('type6Goods'))
-    // })
     
 
     BX24.init(App.run)
     
 }
 App.run = async function(){
+    
     console.log('application run')
     // check size frame application
     if (80 > (window.innerHeight / window.screen.availHeight)*100) {
         BX24.openApplication()
-        return
     }
 
     App.user = await CRM.getCurrentUser()
     let listDeals = await CRM.getDealsList()
     Renders.tableDeals(listDeals || [])
-
-    //await Goods.indexing(await CRM.getProducts())
-    
-
     
 }
 
@@ -1006,31 +984,31 @@ Constructor.type7DataManage = async function(aRecord){
 }
 
 Constructor.type1Calculate = function(record){
-    return -1
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type2Calculate = function(record){
-    return -1
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type3Calculate = function(record){
-    return -1
+    return Number( -1 ).toFixed(2)
 }
 Constructor.type4Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return ( purchase * count ) * surcharge
+    return Number( ( purchase * count ) * surcharge ).toFixed(2)
 }
 Constructor.type5Calculate = function(record){
     let { count, price, width, height } = record
-    return ( ( ( width * height ) * price ) * count )
+    return Number( ( ( ( width * height ) * price ) * count ) ).toFixed(2)
 }
 Constructor.type6Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return ( purchase * count ) * surcharge
+    return Number( ( purchase * count ) * surcharge ).toFixed(2)
 }
 Constructor.type7Calculate = function(record){
     let { count, price } = record
-    return ( price * count )
+    return Number( ( price * count ) ).toFixed(2)
 }
 
 // LIST_CONSTRUCTORS
