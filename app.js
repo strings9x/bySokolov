@@ -1268,6 +1268,8 @@ Goods.indexing = async function(items){
             return
         }
 
+        idIndex[record.id] = record
+
         let destinationValues = destinationIndex[record.destination]
         if (!destinationValues) {
             destinationValues = destinationIndex[record.destination] = []
@@ -1303,12 +1305,13 @@ Goods.indexing = async function(items){
 }
 
 Goods.getGoodsById = async function(id){
-    let goods = Goods.indexes['id'][id]
+    let goods = Goods.getGoodsByIndex('id', id)
+    console.log(id, goods)
     if (!goods) {
         goods = await CRM.getProductById(id)
         if (goods) {
             Goods.indexing(goods)
-            goods = Goods.indexes['id'][id]
+            goods = Goods.getGoodsByIndex('id', id)
         }
     }
     return goods || null
