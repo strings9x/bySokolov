@@ -1216,7 +1216,7 @@ Goods.getGoodsById = async function(id){
     }
     return goods || null
 }
-Goods.getGoodsByFilterDGG = function(aDestination, aGroup, aGrouping){
+Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
     let goods = Goods.getGoodsByIndex('destination.group.grouping', `${aDestination}.${aGroup}.${aGrouping}`)
     console.log(goods)
     if (!goods) {
