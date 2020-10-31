@@ -851,7 +851,7 @@ Constructor.getRecord = function(){
     if (typeof handler !== 'function') {
         return null
     }
-    let record = handler()
+    let record = await handler()
     console.log('getRecord', record)
     return { ...record, type }
 }
@@ -864,7 +864,7 @@ Constructor.setRecord = function(aRecord){
         return null
     }
     console.log('setRecord', aRecord)
-    handler(aRecord)
+    await handler(aRecord)
     
 }
 
