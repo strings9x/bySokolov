@@ -868,7 +868,7 @@ Constructor.setRecord = function(aRecord){
     
 }
 
-Constructor.type1DataManage = function(aRecord){
+Constructor.type1DataManage = async function(aRecord){
     if (aRecord) {
         // setter
 
@@ -882,7 +882,7 @@ Constructor.type1DataManage = function(aRecord){
         return { ...record, cost }
     }
 }
-Constructor.type2DataManage = function(aRecord){
+Constructor.type2DataManage = async function(aRecord){
     if (aRecord) {
         // setter
 
@@ -896,7 +896,7 @@ Constructor.type2DataManage = function(aRecord){
         return { ...record, cost }
     }
 }
-Constructor.type3DataManage = function(aRecord){
+Constructor.type3DataManage = async function(aRecord){
     if (aRecord) {
         // setter
 
@@ -910,7 +910,7 @@ Constructor.type3DataManage = function(aRecord){
         return { ...record, cost }
     }
 }
-Constructor.type4DataManage = function(aRecord){
+Constructor.type4DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { goods, count, note } = aRecord
@@ -927,7 +927,7 @@ Constructor.type4DataManage = function(aRecord){
         return { ...record, cost }
     }
 }
-Constructor.type5DataManage = function(aRecord){
+Constructor.type5DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { stuff, view, goods, tech, height, width, count, note } = aRecord
@@ -954,7 +954,7 @@ Constructor.type5DataManage = function(aRecord){
         return {  ...record, cost }
     }
 }
-Constructor.type6DataManage = function(aRecord){
+Constructor.type6DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { category, group, goods, count, note } = aRecord
@@ -975,7 +975,7 @@ Constructor.type6DataManage = function(aRecord){
         return { ...record, cost }
     }
 }
-Constructor.type7DataManage = function(aRecord){
+Constructor.type7DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { seller, article, price, count, note } = aRecord
