@@ -259,6 +259,7 @@ CRM.getProducts = async function(){
         })
     })
 }
+
 CRM.addCatalog = async function(aCatalog, aName){
     let ARGS = arguments
     return new Promise(function(resolve, reject){
@@ -698,6 +699,7 @@ let Constructor = App.Constructor = {}
 Constructor.currentType = ''
 Constructor.element = $('#constructor')
 Constructor.visible = function(args){
+
     let { type } = args
 
     if (this.currentType === type) {
@@ -714,6 +716,7 @@ Constructor.visible = function(args){
 
     this.element.find(`#${type}`).removeClass('hide')
     this.currentType = type
+
 }
 
 Constructor.getRecord = function(){
@@ -836,9 +839,9 @@ Constructor.type6DataManage = function(aRecord){
         Helper.inputSetValue(Elements.type6Note, note)
     } else {
         // getter
-        let category = Helper.comboboxGetValue(Elements.type6Category)
-        let group = Helper.comboboxGetValue(Elements.type6Group)
-        let goods = Helper.comboboxGetValue(Elements.type6Goods)
+        let category = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Category))
+        let group = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Group))
+        let goods = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Goods))
         let count = Helper.inputGetValue(Elements.type6Count)
         let note = Helper.inputGetValue(Elements.type6Note)
         let record = { category, group, goods, count, note }
@@ -887,8 +890,9 @@ Constructor.type5Calculate = function(record){
     return ( ( ( width * height ) * price ) * count )
 }
 Constructor.type6Calculate = function(record){
-    let { count, price } = record
-    return ( price * count )
+    let { count, goods } = record
+    let { purchase, surcharge } = goods
+    return ( purchase * count ) * surcharge
 }
 Constructor.type7Calculate = function(record){
     let { count, price } = record
