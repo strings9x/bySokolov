@@ -138,8 +138,7 @@ Helper.recordCRMProduct = function(item){
     return { id, name, purchase, currency, surcharge, destination, group, grouping, title }
 }
 Helper.recordTableDealItems = function(item){
-    let { type, goods, price, count, cost, note } = item
-    let title = 'сформировать загаловок' // goods.title
+    let { type, goods, price, count, cost, note, title } = item
     let typeTitle = Enums.builderTypes[type]
     return { type, typeTitle, title, price, count, cost, note }
 }
@@ -197,14 +196,20 @@ const USER = {}
 // CRM
 const CRM = App.CRM = {}
 CRM.getDealsList = function(){
+    let array = []
     return new Promise(function(resolve, reject){
         BX24.callMethod('crm.deal.list', {}, function(result){
             if (result.error()) {
-                console.log(result.error())
-                resolve(null)
-                return
+                console.error(result.error())
+                resolve([])
+            } else {
+                array = array.concat(result.data())
+                if (result.more()) {
+                    result.next()
+                } else {
+                    resolve(array)
+                }
             }
-            resolve(result.answer.result)
         })
     })
 }
@@ -596,13 +601,13 @@ Renders.tableDealItems = function(items){
         let index = 0
         for (let item of items) {
             let record = Helper.recordTableDealItems(item)
-            rowsHTML += `<tr data-item-index=${index}>
+            rowsHTML += `<tr data-item-index=${ index }>
                 <td class="controls"></td>
-                <td>${record.typeTitle}</td>
-                <td>${record.title}</td>
-                <td>${record.count}</td>
-                <td>${record.cost}</td>
-                <td>${record.note}</td>
+                <td>${ record.typeTitle }</td>
+                <td>${ record.title.split('\n').join('</br>') }</td>
+                <td>${ record.count }</td>
+                <td>${ record.cost }</td>
+                <td>${ record.note }</td>
             </tr>`
             index ++
         }
@@ -905,7 +910,8 @@ Constructor.type3DataManage = async function(aRecord){
 
         let count = Number(0)
         let note = ''
-        let record = { count, note }
+        let title = 'ожидание'
+        let record = { count, note, title }
         let cost = Constructor.type3Calculate(record)
         return { ...record, cost }
     }
@@ -922,7 +928,8 @@ Constructor.type4DataManage = async function(aRecord){
         let goods = await Goods.getGoodsById(Helper.listGetValue(Elements.type4Goods))
         let count = Helper.inputGetValue(Elements.type4Count)
         let note = Helper.inputGetValue(Elements.type4Note)
-        let record = { goods, count, note }
+        let title = `${goods.title}`
+        let record = { goods, count, note, title }
         let cost = Constructor.type4Calculate(record)
         return { ...record, cost }
     }
@@ -949,7 +956,8 @@ Constructor.type5DataManage = async function(aRecord){
         let width = Helper.inputGetValue(Elements.type5Width)
         let count = Helper.inputGetValue(Elements.type5Count)
         let note = Helper.inputGetValue(Elements.type5Note)
-        let record = { stuff, view, goods, tech, height, width, count, note }
+        let title = `${view.title}\n${goods.title}\n${height}x${width}`
+        let record = { stuff, view, goods, tech, height, width, count, note, title }
         let cost = Constructor.type5Calculate(record)
         return {  ...record, cost }
     }
@@ -970,7 +978,8 @@ Constructor.type6DataManage = async function(aRecord){
         let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Goods))
         let count = Helper.inputGetValue(Elements.type6Count)
         let note = Helper.inputGetValue(Elements.type6Note)
-        let record = { category, group, goods, count, note }
+        let title = `${group.title}\n${goods.title}`
+        let record = { category, group, goods, count, note, title }
         let cost = Constructor.type6Calculate(record)
         return { ...record, cost }
     }
@@ -991,7 +1000,8 @@ Constructor.type7DataManage = async function(aRecord){
         let price = Helper.inputGetValue(Elements.type7Price)
         let count = Helper.inputGetValue(Elements.type7Count)
         let note = Helper.inputGetValue(Elements.type7Note)
-        let record = { seller, article, price, count, note }
+        let title = `${seller}\n${article}`
+        let record = { seller, article, price, count, note, title }
         let cost = Constructor.type7Calculate(record)
         return { ...record, cost }
     }
@@ -1164,29 +1174,20 @@ const recordImportRowToAddCRMProduct = function(aCatalog, aName, aPurchase, aCur
 const Goods = App.Goods = {}
 Goods.indexes = {}
 Goods.import = async function(aString){
-
     if (typeof aString !== 'string' || aString.length <= 0) {
         return false
     }
-
     let catalogs = {}
     let rows = aString.split('\n')
-
     let argsProductBatch = []
-
     for await (let item of rows) {
-
         let row = item.split('\t')
         let type = row[0]
-
         if (type === 'catalog') {
-
             let catalog = catalogs[row[1]] || App.config.property.catalog.ID
             let name = row[2]
             let id = await CRM.addCatalog(catalog, name)
-
             catalogs[name] = id
-
             // @catalog
             let purchase = (row[3] || '').replace(',', '.')
             let currency = row[4]
@@ -1195,15 +1196,10 @@ Goods.import = async function(aString){
             let group = row[7] || ''
             let grouping = row[8] || ''
             let title = row[9] || name
-            
             await CRM.addProduct(catalogs[name], '@CATALOG', purchase, currency, surcharge, destination, group, grouping, title)
-
             console.log('catalog', name)
-
             await (new Promise(function(resolve){setTimeout(resolve, 500)}))
-
         } else if (type === 'product') {
-
             let catalog = catalogs[row[1]]
             let name = row[2]
             let purchase = (row[3] || '').replace(',', '.')
@@ -1214,21 +1210,14 @@ Goods.import = async function(aString){
             let grouping = row[8] || ''
             let title = row[9] || ''
             let record = recordImportRowToAddCRMProduct(catalog, name, purchase, currency, surcharge, destination, group, grouping, title)
-            
             argsProductBatch.push(record)
-
             console.log('product', name)
-
         }
-
     }
-
     if (argsProductBatch.length > 0) {
         console.log(await CRM.callBatchSame('crm.product.add', argsProductBatch))
     }
-
     return true
-
 }
 Goods.export = async function(){
 
