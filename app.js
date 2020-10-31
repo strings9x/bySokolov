@@ -116,7 +116,7 @@ App.run = async function(){
     let listDeals = await CRM.getDealsList()
     Renders.tableDeals(listDeals || [])
 
-    await Goods.indexing(await CRM.getProducts())
+    //await Goods.indexing(await CRM.getProducts())
     
 
     Helper.listSetItems(Elements.type4Goods, Goods.getGoodsByDestination('type4Goods'))
@@ -239,7 +239,7 @@ CRM.getCurrentUser = function(){
 CRM.getProducts = async function(){
     return new Promise(function(resolve, reject){
         let order = { 'NAME':'ASC' }
-        let filter = { 'CATALOG_ID':App.config.property.catalog.ID }
+        let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
         let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
         let config = { order, filter, select, start:-1 }
         let array = []
@@ -250,7 +250,7 @@ CRM.getProducts = async function(){
             } else {
                 array = array.concat(result.data())
                 if (result.more()) {
-                    //await (new Promise((resolve)=>{ setTimeout(resolve, 150) }))
+                    //await (new Promise((resolve)=>{ setTimeout(resolve, 50) }))
                     result.next()
                 } else {
                     resolve(array)
@@ -259,7 +259,50 @@ CRM.getProducts = async function(){
         })
     })
 }
+CRM.getProductById = async function(aId){
+    return new Promise(function(resolve){
+        BX24.callMethod("crm.product.get", 
+            { id: aId }, 
+            function(result) 
+            {
+                if(result.error()) {
+                    console.error(result.error());
+                    resolve()
+                } else {
+                    resolve(result.data())
+                }
+            }
+        );
+    })
+}
+CRM.getProductsFilterByDGG = async function(aDestination, aGroup, aGrouping){
+    return new Promise(function(resolve){
 
+        let order = { 'NAME': 'ASC' }
+        let filter = { 'ACTIVE':'Y', 'CATALOG_ID':App.config.property.catalog.ID }
+            filter[`?PROPERTY_${App.config.property.goods.DESTINATION}`] = aDestination
+            filter[`?PROPERTY_${App.config.property.goods.GROUP}`] = aGroup
+            filter[`?PROPERTY_${App.config.property.goods.GROUPING}`] = aGrouping
+        let select = [ 'ID', 'NAME', 'PROPERTY_*' ]
+        let args = { order, filter, select }
+
+        let array = []
+
+        BX24.callMethod('crm.product.list', args, async function(result){
+            if (result.error()) {
+                console.error(result.error())
+                resolve()
+            } else {
+                array = array.concat(result.data())
+                if (result.more()) {
+                    result.next()
+                } else {
+                    resolve(array)
+                }
+            }
+        })
+    })
+}
 CRM.addCatalog = async function(aCatalog, aName){
     let ARGS = arguments
     return new Promise(function(resolve, reject){
@@ -303,6 +346,9 @@ CRM.addProduct = async function(aCatalog, aName, aPurchase, aCurrency, aSurcharg
             }  
         })
     })
+}
+CRM.callMethod = async function(aMethod, aARGS){
+    
 }
 CRM.callBatchMain = async function(calls){
     return new Promise(function(resolve){
@@ -1161,8 +1207,31 @@ Goods.indexing = async function(items){
 }
 
 Goods.getGoodsById = function(id){
-    return Goods.indexes['id'][id]
+    let goods = Goods.indexes['id'][id]
+    if (!goods) {
+        goods = await CRM.getProductById(id)
+        if (goods) {
+            Goods.indexing(goods)
+        }
+    }
+    return goods || null
 }
+Goods.getGoodsByFilterDGG = function(aDestination, aGroup, aGrouping){
+    let goods = Goods.getGoodsByIndex('destination.group.grouping', `${aDestination}.${aGroup}.${aGrouping}`)
+    console.log(goods)
+    if (!goods) {
+        goods = await CRM.getProductsFilterByDGG(aDestination, aGroup, aGrouping)
+        if (goods) {
+            Goods.indexing(goods)
+        }
+    }
+    return goods || []
+}
+
+
+
+
+// deprecated
 Goods.getGoodsByDestination = function(destination){
     return Goods.indexes['destination'][destination]
 }
