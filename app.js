@@ -20,11 +20,13 @@ $('.ui .menu .item').on('click', function() {
 
 const type6CategoryChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    console.log(item)
     Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGroup('type6Group', item.group))
 }
 
 const type6GroupChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    console.log(item)
     Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGroup('type6Goods', item.group))
 }
 
@@ -1246,6 +1248,8 @@ Goods.indexing = async function(items){
     let indexDestinationGroup = Goods.indexes['destination.group'] = {}
     let indexDestinationGrouping = Goods.indexes['destination.grouping'] = {}
 
+    
+
     for (let item of items) {
 
         let record = Helper.recordCRMProduct(item)
@@ -1301,7 +1305,6 @@ Goods.getGoodsById = async function(id){
 }
 Goods.getGoodsByFilterD = async function(aDestination){
     let goods = Goods.getGoodsByIndex('destination', `${aDestination}`)
-    console.log(goods)
     if (!goods) {
         goods = await CRM.getProductsFilterByD(aDestination)
         if (goods) {
@@ -1313,7 +1316,6 @@ Goods.getGoodsByFilterD = async function(aDestination){
 }
 Goods.getGoodsByFilterDGroup = async function(aDestination, aGroup){
     let goods = Goods.getGoodsByIndex('destination.group', `${aDestination}.${aGroup}`)
-    console.log(goods)
     if (!goods) {
         goods = await CRM.getProductsFilterByDGroup(aDestination, aGroup)
         if (goods) {
@@ -1325,7 +1327,6 @@ Goods.getGoodsByFilterDGroup = async function(aDestination, aGroup){
 }
 Goods.getGoodsByFilterDGrouping = async function(aDestination, aGrouping){
     let goods = Goods.getGoodsByIndex('destination.grouping', `${aDestination}.${aGrouping}`)
-    console.log(goods)
     if (!goods) {
         goods = await CRM.getProductsFilterByDGrouping(aDestination, aGrouping)
         if (goods) {
