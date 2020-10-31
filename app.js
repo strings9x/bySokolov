@@ -19,13 +19,13 @@ $('.ui .menu .item').on('click', function() {
 
 
 const type6CategoryChange = function(value, text){
-    let catalog = Goods.getGoodsById(value)
+    let catalog = await Goods.getGoodsById(value)
     console.log(catalog)
     Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByFilterDGroup('type6Group', catalog.group))
 }
 
 const type6GroupChange = function(value, text){
-    let catalog = Goods.getGoodsById(value)
+    let catalog = await Goods.getGoodsById(value)
     console.log(catalog)
     Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByFilterDGGroup('type6Goods', catalog.group)) //stination.grouping', `type6Goods.${catalog.group}`))
 }
@@ -918,7 +918,7 @@ Constructor.type4DataManage = function(aRecord){
         Helper.inputSetValue(Elements.type4Note, note)
     } else {
         // getter
-        let goods = Goods.getGoodsById(Helper.listGetValue(Elements.type4Goods))
+        let goods = await Goods.getGoodsById(Helper.listGetValue(Elements.type4Goods))
         let count = Helper.inputGetValue(Elements.type4Count)
         let note = Helper.inputGetValue(Elements.type4Note)
         let record = { goods, count, note }
@@ -964,9 +964,9 @@ Constructor.type6DataManage = function(aRecord){
         Helper.inputSetValue(Elements.type6Note, note)
     } else {
         // getter
-        let category = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Category))
-        let group = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Group))
-        let goods = Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Goods))
+        let category = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Category))
+        let group = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Group))
+        let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Goods))
         let count = Helper.inputGetValue(Elements.type6Count)
         let note = Helper.inputGetValue(Elements.type6Note)
         let record = { category, group, goods, count, note }
