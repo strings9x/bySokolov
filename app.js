@@ -21,14 +21,14 @@ $('.ui .menu .item').on('click', function() {
 const type6CategoryChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
     console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByIndex('destination.grouping', `type6Group.${catalog.group}`))
+    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByIndex('destination.grouping', `type6Group.${catalog.group}`))
 
 }
 
 const type6GroupChange = function(value, text){
     let catalog = Goods.getGoodsById(value)
     console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.group}`))
+    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByIndex('destination.grouping', `type6Goods.${catalog.group}`))
 }
 
 
