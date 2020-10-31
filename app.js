@@ -28,6 +28,16 @@ const type6GroupChange = async function(value, text){
     Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item?.group))
 }
 
+const type5StuffChange = async function(value, text){
+    let item = await Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type5View, await Goods.getGoodsByFilterDGrouping('type5View', item?.group))
+}
+
+const type5ViewChange = async function(value, text){
+    let item = await Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type5Goods, await Goods.getGoodsByFilterDGrouping('type5Goods', item?.group))
+}
+
 
 
 
@@ -87,6 +97,8 @@ App.initialize = async function(){
     $('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
     $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
     
+    $('#constructorType5').find('.controlStuff').parent().dropdown({ duration:0, onChange:type5StuffChange })
+    $('#constructorType5').find('.controlView').parent().dropdown({ duration:0, onChange:type5ViewChange })
 
     BX24.init(App.run)
     
@@ -608,6 +620,7 @@ FrameDeal.open = async function(ID){
     if (result) {
 
         Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
+        Helper.listSetItems(Elements.type5Stuff, await Goods.getGoodsByDestination('type5Stuff'))
         Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
 
         Renders.dealDataWrite()
@@ -838,8 +851,9 @@ Constructor.getRecord = async function(){
         return null
     }
     let record = await handler()
-    console.log('getRecord', record)
-    return { ...record, type }
+    let { cost } = record
+    cost = Number(cost).toFixed(2)
+    return { ...record, type, cost }
 }
 Constructor.setRecord = async function(aRecord){
     let { type } = aRecord
@@ -927,9 +941,9 @@ Constructor.type5DataManage = async function(aRecord){
         Helper.inputSetValue(Elements.type5Note, note)
     } else {
         // getter
-        let stuff = Helper.comboboxGetValue(Elements.type5Stuff)
-        let view = Helper.comboboxGetValue(Elements.type5View)
-        let goods = Helper.comboboxGetValue(Elements.type5Goods)
+        let stuff = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Stuff))
+        let view = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5View))
+        let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Goods))
         let tech = Helper.comboboxGetValue(Elements.type5Tech)
         let height = Helper.inputGetValue(Elements.type5Height)
         let width = Helper.inputGetValue(Elements.type5Width)
@@ -984,31 +998,32 @@ Constructor.type7DataManage = async function(aRecord){
 }
 
 Constructor.type1Calculate = function(record){
-    return Number( -1 ).toFixed(2)
+    return -1
 }
 Constructor.type2Calculate = function(record){
-    return Number( -1 ).toFixed(2)
+    return -1
 }
 Constructor.type3Calculate = function(record){
-    return Number( -1 ).toFixed(2)
+    return -1
 }
 Constructor.type4Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return Number( ( purchase * count ) * surcharge ).toFixed(2)
+    return ( ( purchase * surcharge ) * count )
 }
 Constructor.type5Calculate = function(record){
-    let { count, price, width, height } = record
-    return Number( ( ( ( width * height ) * price ) * count ) ).toFixed(2)
+    let { count, goods, width, height } = record
+    let { purchase, surcharge } = goods
+    return ( ( ( width/1000 * height/1000 ) * ( purchase * surcharge ) ) * count )
 }
 Constructor.type6Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return Number( ( purchase * count ) * surcharge ).toFixed(2)
+    return ( ( purchase * surcharge ) * count )
 }
 Constructor.type7Calculate = function(record){
     let { count, price } = record
-    return Number( ( price * count ) ).toFixed(2)
+    return ( price * count )
 }
 
 // LIST_CONSTRUCTORS
