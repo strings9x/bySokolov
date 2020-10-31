@@ -1206,7 +1206,7 @@ Goods.indexing = async function(items){
     }
 }
 
-Goods.getGoodsById = function(id){
+Goods.getGoodsById = async function(id){
     let goods = Goods.indexes['id'][id]
     if (!goods) {
         goods = await CRM.getProductById(id)
