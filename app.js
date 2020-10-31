@@ -19,15 +19,13 @@ $('.ui .menu .item').on('click', function() {
 
 
 const type6CategoryChange = function(value, text){
-    let catalog = await Goods.getGoodsById(value)
-    console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByFilterDGroup('type6Group', catalog.group))
+    let item = await Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type6Group, Goods.getGoodsByFilterDGroup('type6Group', item.group))
 }
 
 const type6GroupChange = function(value, text){
-    let catalog = await Goods.getGoodsById(value)
-    console.log(catalog)
-    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByFilterDGGroup('type6Goods', catalog.group)) //stination.grouping', `type6Goods.${catalog.group}`))
+    let item = await Goods.getGoodsById(value)
+    Helper.comboboxSetItems(Elements.type6Goods, Goods.getGoodsByFilterDGGroup('type6Goods', item.group))
 }
 
 
@@ -118,8 +116,7 @@ App.run = async function(){
     //await Goods.indexing(await CRM.getProducts())
     
 
-    Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
-    Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
+    
 }
 
 
@@ -623,6 +620,10 @@ FrameDeal.open = async function(ID){
     Deal.ID = ID
     let result = await Deal.dataGet()
     if (result) {
+
+        Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
+        Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
+        
         Renders.dealDataWrite()
         $('.ui.modal').modal({duration:0}).modal('show')
     } else {
