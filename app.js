@@ -1240,15 +1240,19 @@ Goods.migration = async function(){
 
 Goods.indexing = async function(items){
 
-    let idIndex = Goods.indexes['id'] = {}
-    let destinationIndex = Goods.indexes['destination'] = {}
-    let groupIndex = Goods.indexes['group'] = {}
-    let groupingIndex = Goods.indexes['grouping'] = {}
+    let idIndex = Goods.indexes['id'] || ( Goods.indexes['id'] = {} )
+    let destinationIndex = Goods.indexes['destination'] || ( Goods.indexes['destination'] = {} )
+    let groupIndex = Goods.indexes['group'] || ( Goods.indexes['group'] = {} )
+    let groupingIndex = Goods.indexes['grouping'] || ( Goods.indexes['grouping'] = {} )
 
-    let indexDestinationGroup = Goods.indexes['destination.group'] = {}
-    let indexDestinationGrouping = Goods.indexes['destination.grouping'] = {}
+    let indexDestinationGroup = Goods.indexes['destination.group'] || ( Goods.indexes['destination.group'] = {} )
+    let indexDestinationGrouping = Goods.indexes['destination.grouping'] || ( Goods.indexes['destination.grouping'] = {} )
 
-    
+    console.log(items)
+    if (!Array.isArray(items)) {
+        return
+    }
+
 
     for (let item of items) {
 
