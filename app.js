@@ -1,5 +1,7 @@
 (function($){
 
+console.log('local')
+
 $('.menu .item').tab()
 $('.ui .accordion').accordion({ duration:0 })
 $('.ui .dropdown').dropdown({ duration:0 })
@@ -161,6 +163,7 @@ Helper.comboboxGetValue = function(aElement){
     return aElement.find('.active').attr('data-value')
 }
 Helper.comboboxSetValue = function(aElement, aValue){
+    aElement.find(`[data-value="${aValue}"]`).click()
 }
 Helper.comboboxSetItems = function(aElement, aItems = []){
     let items = ''
@@ -173,8 +176,7 @@ Helper.listGetValue = function(aElement){
     return aElement.find('.active').attr('data-value')
 }
 Helper.listSetValue = function(aElement, aValue){
-    aElement.find('.active').removeClass('.active')
-    aElement.find(`[name="${aValue}"]`)
+    aElement.find(`[data-value="${aValue}"]`).click()
 }
 Helper.listSetItems = function(aElement, aItems = []){
     let items = ''
@@ -938,10 +940,10 @@ Constructor.type5DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { stuff, view, goods, tech, height, width, count, note } = aRecord
-        Helper.comboboxGetValue(Elements.type5Stuff, stuff)
-        Helper.comboboxGetValue(Elements.type5View, view)
-        Helper.comboboxGetValue(Elements.type5Goods, goods)
-        Helper.comboboxGetValue(Elements.type5Tech, tech)
+        Helper.comboboxSetValue(Elements.type5Stuff, stuff.id)
+        Helper.comboboxSetValue(Elements.type5View, view.id)
+        Helper.comboboxSetValue(Elements.type5Goods, goods.id)
+        Helper.comboboxSetValue(Elements.type5Tech, tech)
         Helper.inputSetValue(Elements.type5Height, height)
         Helper.inputSetValue(Elements.type5Width, width)
         Helper.inputSetValue(Elements.type5Count, count)
@@ -965,10 +967,11 @@ Constructor.type5DataManage = async function(aRecord){
 Constructor.type6DataManage = async function(aRecord){
     if (aRecord) {
         // setter
+        console.log(aRecord)
         let { category, group, goods, count, note } = aRecord
-        Helper.comboboxSetValue(Elements.type6Category, category)
-        Helper.comboboxSetValue(Elements.type6Group, group)
-        Helper.comboboxSetValue(Elements.type6Goods, goods)
+        Helper.comboboxSetValue(Elements.type6Category, category.id)
+        Helper.comboboxSetValue(Elements.type6Group, group.id)
+        Helper.comboboxSetValue(Elements.type6Goods, goods.id)
         Helper.inputSetValue(Elements.type6Count, count)
         Helper.inputSetValue(Elements.type6Note, note)
     } else {
@@ -981,6 +984,7 @@ Constructor.type6DataManage = async function(aRecord){
         let title = `${group.title}\n${goods.title}`
         let record = { category, group, goods, count, note, title }
         let cost = Constructor.type6Calculate(record)
+        console.log(record)
         return { ...record, cost }
     }
 }
@@ -1236,7 +1240,6 @@ Goods.indexing = async function(items){
     let indexDestinationGroup = Goods.indexes['destination.group'] || ( Goods.indexes['destination.group'] = {} )
     let indexDestinationGrouping = Goods.indexes['destination.grouping'] || ( Goods.indexes['destination.grouping'] = {} )
 
-    console.log(items)
     if (!Array.isArray(items) && typeof items === 'object') {
         items = [items]
     }
@@ -1288,7 +1291,6 @@ Goods.indexing = async function(items){
 
 Goods.getGoodsById = async function(id){
     let goods = Goods.getGoodsByIndex('id', id)
-    console.log(id, goods)
     if (!goods) {
         goods = await CRM.getProductById(id)
         if (goods) {
@@ -1344,11 +1346,8 @@ Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
     return goods || []
 }
 
-
-
-
-// deprecated
 Goods.getGoodsByDestination = async function(aDestination){
+    console.log('deprecated')
     let goods = Goods.getGoodsByIndex('destination', aDestination)
     if (!goods) {
         goods = await CRM.getProductsFilterByD(aDestination)
@@ -1368,8 +1367,6 @@ Goods.getGoodsByGrouping = function(grouping){
 Goods.getGoodsByIndex = function(name, value){
     return Goods.indexes[name]?.[value]
 }
-
-
 
 
 
