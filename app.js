@@ -127,6 +127,27 @@ Enums.builderTypes = { type1:'корпус', type2:'лдсп/фасад', type3:
 
 // Helper
 const Helper = window.Helper = {}
+Helper.costBeautifier = function(aValue){
+    let value = typeof aValue === 'string' ? aValue.trim() : typeof aValue === 'number' ? String(aValue) : undefined
+    if (['string', 'number'].includes(typeof value)) {
+        let array = value.split('.')
+        let main = array[0]
+        let fraction = array[1] || '00'
+        if (main.length > 3) {
+            let startPos = (main.length % 3)
+            let newStr = main.substr(startPos)
+            let remainingStr = main.substr(0, startPos)
+            let parts = newStr.match(/.{1,3}/g)
+            if (remainingStr != '') {
+                parts.unshift(remainingStr)
+            }
+            main = parts.join(' ')
+        }
+        value = [main, fraction].join('.')
+    }
+
+    return value
+}
 Helper.recordCRMProduct = function(item){
     let id = item['ID']
     let name = item['NAME']
@@ -149,7 +170,7 @@ Helper.recordTableDeals = function(item){
     let id = ID
     let date = (new Date(DATE_CREATE)).toLocaleDateString()
     let title = TITLE
-    let cost = `${OPPORTUNITY} ${CURRENCY_ID}`
+    let cost = `${OPPORTUNITY || '0.00'} ${CURRENCY_ID || 'RUB'}`
     let note = ''
     return { id, date, title, cost, note }
 }
@@ -261,6 +282,7 @@ CRM.getProducts = async function(){
     })
 }
 CRM.getProductById = async function(aId){
+    console.log(aId)
     return new Promise(function(resolve){
         BX24.callMethod("crm.product.get", 
             { id: aId }, 
@@ -474,6 +496,7 @@ Elements.labelClient = $('#labelClient')
 Elements.tableDealItems = $('#tableDealItems')
 Elements.listConstructors = $('#listConstructors')
 Elements.labelCost = $('#labelCost')
+Elements.labelCostValue = $('#labelCost').find('.control-value')
 // Frame-Constructor
 Elements.btnConstructorAddItem = $('#btnConstructorAddItem')
 Elements.btnConstructorChangeItem = $('#btnConstructorChangeItem')
@@ -543,14 +566,16 @@ Renders.dealDataClear = function(){
     Renders.labelClient()
     Renders.labelCost()
     Renders.tableDealItems()
+
 }
 Renders.dealDataWrite = function(){
     let record = Deal.BXRecord
     let bill = Deal.getCurrentBill()
     Renders.labelID(record.ID)
     Renders.labelClient(record.TITLE)
-    Renders.labelCost(0)
+    Renders.labelCost(bill.cost)
     Renders.tableDealItems(bill.items)
+
 }
 
 Renders.tableDeals = function(items){
@@ -560,11 +585,11 @@ Renders.tableDeals = function(items){
         for (let item of items) {
             let record = Helper.recordTableDeals(item)
             rowsHTML += `<tr>
-                <td>${record.id}</td>
-                <td>${record.date}</td>
-                <td>${record.title}</td>
-                <td>${record.cost}</td>
-                <td>${record.note}</td>
+                <td>${ record.id }</td>
+                <td>${ record.date }</td>
+                <td>${ record.title }</td>
+                <td>${ Helper.costBeautifier(record.cost) }</td>
+                <td>${ record.note }</td>
             </tr>`
         }
         element.empty().html(rowsHTML)
@@ -591,9 +616,10 @@ Renders.labelClient = function(value){
 Renders.labelCost = function(value){
     let element = Elements.labelCost.find('.control-value')
     if (typeof value !== 'undefined') {
-        element.html(value)
+        element.html( Helper.costBeautifier(value) )
     } else {
         element.empty()
+        element.html(0)
     }
 }
 Renders.tableDealItems = function(items){
@@ -608,7 +634,7 @@ Renders.tableDealItems = function(items){
                 <td>${ record.typeTitle }</td>
                 <td>${ record.title.split('\n').join('</br>') }</td>
                 <td>${ record.count }</td>
-                <td>${ record.cost }</td>
+                <td>${ Helper.costBeautifier(record.cost) }</td>
                 <td>${ record.note }</td>
             </tr>`
             index ++
@@ -684,7 +710,6 @@ Deal.dataGet = function(){
                 Deal.ORIGIN = JSON.stringify(struct)
                 Deal.CURRENT = struct
             }
-            console.log(Deal)
             resolve(true)
         })
     })
@@ -763,6 +788,7 @@ Deal.billStructCreate = function(){
     struct.items = []
     struct.property = {}
     struct.title = 'DEFAULT'
+    struct.cost = 0
     return struct
 }
 Deal.billStructCheck = function(){
@@ -823,6 +849,10 @@ Deal.setCurrentBill = function(aBill){
     aBill.items.sort(function(a, b){
         return Number(a.type.replace('type', '')) - Number(b.type.replace('type', ''))
     })
+    let cost = aBill.items.reduce(function(cost, item, index, array){
+        return cost + Number(item.cost)
+    }, 0)
+    aBill.cost = cost.toFixed(2)
     bills[billCurrentIndex] = aBill
 }
 
@@ -1023,21 +1053,21 @@ Constructor.type3Calculate = function(record){
 Constructor.type4Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return ( ( purchase * surcharge ) * count )
+    return ( ( Number(purchase) * Number(surcharge) ) * Number(count) )
 }
 Constructor.type5Calculate = function(record){
     let { count, goods, width, height } = record
     let { purchase, surcharge } = goods
-    return ( ( ( width/1000 * height/1000 ) * ( purchase * surcharge ) ) * count )
+    return ( ( ( Number(width)/1000 * Number(height)/1000 ) * ( Number(purchase) * Number(surcharge) ) ) * Number(count) )
 }
 Constructor.type6Calculate = function(record){
     let { count, goods } = record
     let { purchase, surcharge } = goods
-    return ( ( purchase * surcharge ) * count )
+    return ( ( Number(purchase) * Number(surcharge) ) * Number(count) )
 }
 Constructor.type7Calculate = function(record){
     let { count, price } = record
-    return ( price * count )
+    return ( Number(price) * Number(count) )
 }
 
 // LIST_CONSTRUCTORS
@@ -1057,6 +1087,8 @@ const btnConstructorAddItemClick = async function(event){
     bill.items.push(record)
     Deal.setCurrentBill(bill)
     Renders.tableDealItems(bill.items)
+    Renders.labelCost(bill.cost)
+
 }
 const btnConstructorChangeItemClick = async function(event){
     let index = TableDealItems.selectIndex
@@ -1068,6 +1100,8 @@ const btnConstructorChangeItemClick = async function(event){
     bill.items[index] = record
     Deal.setCurrentBill(bill)
     Renders.tableDealItems(bill.items)
+    Renders.labelCost(bill.cost)
+
 }
 
 const btnRemoveSelectDealItemClick = async function(event){
@@ -1080,6 +1114,8 @@ const btnRemoveSelectDealItemClick = async function(event){
     bill.items.splice(index, 1)
     Deal.setCurrentBill(bill)
     Renders.tableDealItems(bill.items)
+    Renders.labelCost(bill.cost)
+
 }
 
 
@@ -1110,6 +1146,7 @@ const saveOrderClick = function(){
 
 const printOrderClick = function(){
     console.log('todo: print order')
+    
 }
 
 const tableDealsDoubleClick = function(event){
