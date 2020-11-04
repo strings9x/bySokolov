@@ -44,12 +44,16 @@ const type5ViewChange = async function(value, text){
 
 
 // App
-const App = window.App = {}
+const App = {}
 App.user = null
 App.config = {
-
     property:{
         // refactoring
+        storage:{
+            MAIN:557,
+            IMAGES:559,
+            GOODS:561
+        },
         catalog:{
             ID:21
         },
@@ -69,13 +73,19 @@ App.config = {
         }
 
     }
-
 }
+
 App.install = function(){
     // проверить поле в сделках UF_CRM_CABFUR
     // записать название поля в BX24.app.option.set
 }
 App.initialize = async function(){
+
+    jQuery.expr[":"].containsNoCase = jQuery.expr.createPseudo(function(arg) {
+        return function( elem ) {
+            return jQuery(elem).text().toLowerCase().indexOf(arg.toLowerCase()) >= 0;
+        };
+    });
 
     $('#buttonNewOrder').on('click', newOrderClick)
     $('#buttonCloseOrder').on('click', btnCloseFrameDealClick)
@@ -102,6 +112,17 @@ App.initialize = async function(){
     $('#constructorType5').find('.controlStuff').parent().dropdown({ duration:0, onChange:type5StuffChange })
     $('#constructorType5').find('.controlView').parent().dropdown({ duration:0, onChange:type5ViewChange })
 
+
+    $('.vclInputFilter').on('input', function(event){
+        let value = event?.target?.value || ''
+        if (value.length > 0) {
+            $(tableDeals).find('tbody').find(`tr`).show()
+            $(tableDeals).find('tbody').find(`tr:not(:containsNoCase(${value}))`).hide()
+        } else {
+            $(tableDeals).find('tbody').find(`tr`).show()
+        }
+    })
+
     BX24.init(App.run)
     
 }
@@ -126,7 +147,7 @@ Enums.builderTypes = { type1:'корпус', type2:'лдсп/фасад', type3:
 
 
 // Helper
-const Helper = window.Helper = {}
+const Helper = {}
 Helper.costBeautifier = function(aValue){
     let value = typeof aValue === 'string' ? aValue.trim() : typeof aValue === 'number' ? String(aValue) : undefined
     if (['string', 'number'].includes(typeof value)) {
@@ -193,19 +214,21 @@ Helper.comboboxSetItems = function(aElement, aItems = []){
     }
     aElement.empty().html(items)
 }
-Helper.listGetValue = function(aElement){
+Helper.comboboxClear = function(){}
+Helper.listboxGetValue = function(aElement){
     return aElement.find('.active').attr('data-value')
 }
-Helper.listSetValue = function(aElement, aValue){
+Helper.listboxSetValue = function(aElement, aValue){
     aElement.find(`[data-value="${aValue}"]`).click()
 }
-Helper.listSetItems = function(aElement, aItems = []){
+Helper.listboxSetItems = function(aElement, aItems = []){
     let items = ''
     for (let item of aItems) {
         items += `<div class="item" data-value=${item.id}>${item.title}</div>`
     }
     aElement.empty().html(items)
 }
+Helper.listboxClear = function(){}
 
 // USER
 
@@ -213,11 +236,28 @@ const USER = {}
 
 
 
+const BX = {}
+BX.fileDownload = async function(aID){
+    return new Promise(async function(resolve, reject){
+        let args = { id:aID }
+        BX24.callMethod('disk.file.get', args, async function(result){
+            if (result.error()) {
+                reject(result.error())
+            } else {
+                let file = result.data()
+                let url = file?.DOWNLOAD_URL
+                let buffer = await fetch(url).then(async function(res){return (await res.body.getReader().read())?.value })
+                let string = new TextDecoder('utf-8').decode(buffer)
 
-
+                resolve( JSON.parse(string) )
+            }
+        })
+    })
+}
+BX.fileUpload = async function(){}
 
 // CRM
-const CRM = App.CRM = {}
+const CRM = {}
 CRM.getDealsList = function(){
     let array = []
     return new Promise(function(resolve, reject){
@@ -483,7 +523,7 @@ CRM.callBatchSame = async function(aMethod, aARGS){
 
 
 
-const Elements = App.Elements = {}
+const Elements = {}
 Elements.HIDDEN_CONTROLS = $('#HIDDEN_CONTROLS')
 Elements.buttonNewOrder = $('#buttonNewOrder')
 Elements.tableDeals = $('#tableDeals')
@@ -554,7 +594,7 @@ Elements.type7Note = Elements.type7Constructor.find('.controlNote')
 
 
 // UI Renders
-const Renders = App.Renders = {}
+const Renders = {}
 Renders.UIElementError = function(){
     // red
 }
@@ -646,15 +686,15 @@ Renders.tableDealItems = function(items){
 }
 
 // FrameDeal
-const FrameDeal = App.FrameDeal = {}
+const FrameDeal = {}
 FrameDeal.open = async function(ID){
     Deal.ID = ID
     let result = await Deal.dataGet()
     if (result) {
 
-        Helper.listSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
-        Helper.listSetItems(Elements.type5Stuff, await Goods.getGoodsByDestination('type5Stuff'))
-        Helper.listSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
+        Helper.listboxSetItems(Elements.type4Goods, await Goods.getGoodsByDestination('type4Goods'))
+        Helper.listboxSetItems(Elements.type5Stuff, await Goods.getGoodsByDestination('type5Stuff'))
+        Helper.listboxSetItems(Elements.type6Category, await Goods.getGoodsByDestination('type6Category'))
 
         Renders.dealDataWrite()
         $('.ui.modal').modal({duration:0}).modal('show')
@@ -674,7 +714,7 @@ FrameDeal.close = async function(){
 }
 
 // Deal
-const Deal = App.Deal = {}
+const Deal = {}
 Deal.ID = 0
 Deal.BXRecord = null
 Deal.ORIGIN = '{}'
@@ -857,7 +897,7 @@ Deal.setCurrentBill = function(aBill){
 }
 
 // Constructor
-let Constructor = App.Constructor = {}
+let Constructor = {}
 Constructor.currentType = ''
 Constructor.element = $('#constructor')
 Constructor.visible = function(args){
@@ -952,12 +992,12 @@ Constructor.type4DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { goods, count, note } = aRecord
-        Helper.listSetValue(Elements.type4Goods, goods.id)
+        Helper.listboxSetValue(Elements.type4Goods, goods.id)
         Helper.inputSetValue(Elements.type4Count, count)
         Helper.inputSetValue(Elements.type4Note, note)
     } else {
         // getter
-        let goods = await Goods.getGoodsById(Helper.listGetValue(Elements.type4Goods))
+        let goods = await Goods.getGoodsById(Helper.listboxGetValue(Elements.type4Goods))
         let count = Helper.inputGetValue(Elements.type4Count)
         let note = Helper.inputGetValue(Elements.type4Note)
         let title = `${goods.title}`
@@ -1146,7 +1186,7 @@ const saveOrderClick = function(){
 
 const printOrderClick = function(){
     console.log('todo: print order')
-    
+    $('.ui.modal').modal({duration:0}).modal('show')
 }
 
 const tableDealsDoubleClick = function(event){
@@ -1212,7 +1252,7 @@ const recordImportRowToAddCRMProduct = function(aCatalog, aName, aPurchase, aCur
     return { fields }
 }
 
-const Goods = App.Goods = {}
+const Goods = {}
 Goods.indexes = {}
 Goods.import = async function(aString){
     if (typeof aString !== 'string' || aString.length <= 0) {
@@ -1263,7 +1303,11 @@ Goods.import = async function(aString){
 Goods.export = async function(){
 
 }
-Goods.migration = async function(){
+
+Goods.importIndexes = async function(aIndexes){
+
+}
+Goods.exportIndexes = async function(aIndexes){
 
 }
 
@@ -1405,7 +1449,28 @@ Goods.getGoodsByIndex = function(name, value){
     return Goods.indexes[name]?.[value]
 }
 
+Goods.setCache = async function(aGoods){
+    return new Promise(function(resolve){
+        let value = JSON.stringify(aGoods)
+        BX24.appOption.set('cacheGoods', value, function(){
+            resolve(true)
+        })
+    })
+}
+Goods.getCache = async function(){
+    return new Promise(function(resolve){
+        resolve(BX24.appOption.get('cacheGoods') || [])
+    })
+}
+Goods.updateCache = async function(){
+    let goods = await CRM.getProducts()
+    return await Goods.setCache(goods)
+}
 
+const WHOLE = window.WHOLE = {
+    App, BX, Helper, Renders, CRM, Goods, FrameDeal, Deal, Builder:Constructor, Elements, Enums
+}
+const W = WHOLE
 
 App.initialize()
 
