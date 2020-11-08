@@ -57,7 +57,9 @@ App.config = {
         catalog:{
             ID:21
         },
-
+        cacheFile:{
+            ID:565
+        },
         goods:{
             PURCHASE:173,
             CURRENCY:175,
@@ -136,7 +138,10 @@ App.run = async function(){
 
     App.user = await CRM.getCurrentUser()
     let listDeals = await CRM.getDealsList()
+
     Renders.tableDeals(listDeals || [])
+
+    await Goods.initialize()
     
 }
 
@@ -239,6 +244,28 @@ const USER = {}
 const BX = {}
 BX.fileDownload = async function(aID){
     return new Promise(async function(resolve, reject){
+
+        function mergeTypedArrays(a, b) {
+            // Checks for truthy values on both arrays
+            if(!a && !b) throw 'Please specify valid arguments for parameters a and b.';  
+        
+            // Checks for truthy values or empty arrays on each argument
+            // to avoid the unnecessary construction of a new array and
+            // the type comparison
+            if(!b || b.length === 0) return a;
+            if(!a || a.length === 0) return b;
+        
+            // Make sure that both typed arrays are of the same type
+            if(Object.prototype.toString.call(a) !== Object.prototype.toString.call(b))
+                throw 'The types of the two arguments passed for parameters a and b do not match.';
+        
+            var c = new a.constructor(a.length + b.length);
+            c.set(a);
+            c.set(b, a.length);
+        
+            return c;
+        }
+
         let args = { id:aID }
         BX24.callMethod('disk.file.get', args, async function(result){
             if (result.error()) {
@@ -246,15 +273,57 @@ BX.fileDownload = async function(aID){
             } else {
                 let file = result.data()
                 let url = file?.DOWNLOAD_URL
-                let buffer = await fetch(url).then(async function(res){return (await res.body.getReader().read())?.value })
-                let string = new TextDecoder('utf-8').decode(buffer)
-
-                resolve( JSON.parse(string) )
+                let res = await fetch(url)
+                let reader = res.body.getReader()
+                let data
+                while (true) {
+                    const { done, value} = await reader.read()
+                    if (done) {
+                        resolve( data )
+                        break
+                    } else {
+                        data = mergeTypedArrays(data, value)
+                    }
+                }                
             }
         })
     })
 }
-BX.fileUpload = async function(){}
+BX.fileUpload = async function(aID, aName, aBuffer, aCategory){
+    return new Promise(function(resolve, reject){
+        // let file = FileReader
+        let args = {
+            id:aID,
+            data: {
+                NAME:aName,
+                PARENT_ID:aCategory||0
+            },
+            fileContent:aBuffer
+        }
+        BX24.callMethod('disk.storage.uploadfile', args, async function(result){
+            if (result.error()) {
+                reject(result.error())
+            } else {
+                // CODE HERE
+            }
+        })
+    })
+}
+BX.fileUpdate = async function(aID, aBase64){
+    return new Promise(function(resolve, reject){
+        let args = {
+            id:aID,
+            fileContent:aBase64
+        }
+        BX24.callMethod('disk.file.uploadversion', args, async function(result){
+            if (result.error()) {
+                reject(result.error())
+            } else {
+                resolve(result.data())
+            }
+        })
+    })
+}
 
 // CRM
 const CRM = {}
@@ -1145,11 +1214,18 @@ const btnConstructorChangeItemClick = async function(event){
 }
 
 const btnRemoveSelectDealItemClick = async function(event){
+
     console.log('remove dealitem btn click', event)
+
     event.stopPropagation()
     Elements.HIDDEN_CONTROLS.append(Elements.btnRemoveSelectDealItem)
 
+    
     let index = TableDealItems.selectIndex
+    if (index === null) {
+        console.log('selected index', index)
+        return
+    }
     let bill = Deal.getCurrentBill()
     bill.items.splice(index, 1)
     Deal.setCurrentBill(bill)
@@ -1157,14 +1233,6 @@ const btnRemoveSelectDealItemClick = async function(event){
     Renders.labelCost(bill.cost)
 
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -1216,6 +1284,7 @@ TableDealItems.element.on('click', function(event){
         activeRow.removeClass('active')
     }
     element.addClass('active').find('.controls').append(Elements.btnRemoveSelectDealItem)
+
 })
 
 TableDealItems.element.on('dblclick', async function(event){
@@ -1449,29 +1518,59 @@ Goods.getGoodsByIndex = function(name, value){
     return Goods.indexes[name]?.[value]
 }
 
+
+
+Goods.downloadCache = async function(){
+    let buffer = await BX.fileDownload( App.config.property.cacheFile.ID )
+
+    let data = new TextDecoder('utf-8').decode(buffer)
+    return JSON.parse(data)
+}
+
+Goods.updateCache = async function(aCache){
+    let content = btoa(JSON.stringify(aCache))
+    let result = await BX.fileUpdate(App.config.property.cacheFile.ID, content)
+    if (result) {
+        return true
+    }
+    return false
+}
+
+
+
 Goods.setCache = async function(aGoods){
-    return new Promise(function(resolve){
-        let value = JSON.stringify(aGoods)
-        BX24.appOption.set('cacheGoods', value, function(){
-            resolve(true)
-        })
-    })
+    return await Goods.updateCache(aGoods)
 }
+
 Goods.getCache = async function(){
-    return new Promise(function(resolve){
-        resolve(BX24.appOption.get('cacheGoods') || [])
-    })
+    return await Goods.downloadCache()
 }
-Goods.updateCache = async function(){
+
+Goods.updateCacheTEST = async function(){
     let goods = await CRM.getProducts()
     return await Goods.setCache(goods)
 }
 
+Goods.initialize = async function(){
+    let cache = await Goods.getCache()
+    await Goods.indexing(cache)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 const WHOLE = window.WHOLE = {
     App, BX, Helper, Renders, CRM, Goods, FrameDeal, Deal, Builder:Constructor, Elements, Enums
 }
-const W = WHOLE
 
-App.initialize()
+WHOLE.App.initialize()
 
 })($)
