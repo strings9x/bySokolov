@@ -18,27 +18,31 @@ $('.ui .menu .item').on('click', function() {
 
 
 
-
-
-const type6CategoryChange = async function(value, text){
-    let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item?.group))
-}
-
-const type6GroupChange = async function(value, text){
-    let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item?.group))
-}
-
 const type5StuffChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type5View, await Goods.getGoodsByFilterDGrouping('type5View', item?.group))
+    await Helper.comboboxSetItems(Elements.type5View, await Goods.getGoodsByFilterDGrouping('type5View', item?.group))
+    await Helper.comboboxSetValue(Elements.type5View, Constructor.currentRecord?.view?.id)
 }
 
 const type5ViewChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
-    Helper.comboboxSetItems(Elements.type5Goods, await Goods.getGoodsByFilterDGrouping('type5Goods', item?.group))
+    await Helper.comboboxSetItems(Elements.type5Goods, await Goods.getGoodsByFilterDGrouping('type5Goods', item?.group))
+    await Helper.comboboxSetValue(Elements.type5Goods, Constructor.currentRecord?.goods?.id)
 }
+
+const type6CategoryChange = async function(value, text){
+    let item = await Goods.getGoodsById(value)
+    await Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item?.group))
+    await Helper.comboboxSetValue(Elements.type6Group, Constructor.currentRecord?.group?.id)
+}
+
+const type6GroupChange = async function(value, text){
+    let item = await Goods.getGoodsById(value)
+    await Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item?.group))
+    await Helper.comboboxSetValue(Elements.type6Goods, Constructor.currentRecord?.goods?.id)
+}
+
+
 
 
 
@@ -108,12 +112,13 @@ App.initialize = async function(){
         element.addClass('active')
     })
 
-    $('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
-    $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
-    
     $('#constructorType5').find('.controlStuff').parent().dropdown({ duration:0, onChange:type5StuffChange })
     $('#constructorType5').find('.controlView').parent().dropdown({ duration:0, onChange:type5ViewChange })
 
+    $('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
+    $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
+    
+    
 
     $('.vclInputFilter').on('input', function(event){
         let value = event?.target?.value || ''
@@ -209,10 +214,10 @@ Helper.inputSetValue = function(aElement, aValue){
 Helper.comboboxGetValue = function(aElement){
     return aElement.find('.active').attr('data-value')
 }
-Helper.comboboxSetValue = function(aElement, aValue){
+Helper.comboboxSetValue = async function(aElement, aValue){
     aElement.find(`[data-value="${aValue}"]`).click()
 }
-Helper.comboboxSetItems = function(aElement, aItems = []){
+Helper.comboboxSetItems = async function(aElement, aItems = []){
     let items = ''
     for (let item of aItems) {
         items += `<div class="item" data-value=${item.id}>${item.title}</div>`
@@ -223,10 +228,10 @@ Helper.comboboxClear = function(){}
 Helper.listboxGetValue = function(aElement){
     return aElement.find('.active').attr('data-value')
 }
-Helper.listboxSetValue = function(aElement, aValue){
+Helper.listboxSetValue = async function(aElement, aValue){
     aElement.find(`[data-value="${aValue}"]`).click()
 }
-Helper.listboxSetItems = function(aElement, aItems = []){
+Helper.listboxSetItems = async function(aElement, aItems = []){
     let items = ''
     for (let item of aItems) {
         items += `<div class="item" data-value=${item.id}>${item.title}</div>`
@@ -967,6 +972,7 @@ Deal.setCurrentBill = function(aBill){
 
 // Constructor
 let Constructor = {}
+Constructor.currentRecord = null
 Constructor.currentType = ''
 Constructor.element = $('#constructor')
 Constructor.visible = function(args){
@@ -1002,6 +1008,7 @@ Constructor.getRecord = async function(){
     return { ...record, type, cost }
 }
 Constructor.setRecord = async function(aRecord){
+    Constructor.currentRecord = aRecord
     let { type } = aRecord
     type = type.replace('t', 'constructorT')
     Constructor.visible({ type })
@@ -1078,11 +1085,10 @@ Constructor.type4DataManage = async function(aRecord){
 Constructor.type5DataManage = async function(aRecord){
     if (aRecord) {
         // setter
-        let { stuff, view, goods, tech, height, width, count, note } = aRecord
+        let { stuff, view, goods, height, width, count, note } = aRecord
         Helper.comboboxSetValue(Elements.type5Stuff, stuff.id)
         Helper.comboboxSetValue(Elements.type5View, view.id)
         Helper.comboboxSetValue(Elements.type5Goods, goods.id)
-        Helper.comboboxSetValue(Elements.type5Tech, tech)
         Helper.inputSetValue(Elements.type5Height, height)
         Helper.inputSetValue(Elements.type5Width, width)
         Helper.inputSetValue(Elements.type5Count, count)
@@ -1092,13 +1098,12 @@ Constructor.type5DataManage = async function(aRecord){
         let stuff = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Stuff))
         let view = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5View))
         let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Goods))
-        let tech = Helper.comboboxGetValue(Elements.type5Tech)
         let height = Helper.inputGetValue(Elements.type5Height)
         let width = Helper.inputGetValue(Elements.type5Width)
         let count = Helper.inputGetValue(Elements.type5Count)
         let note = Helper.inputGetValue(Elements.type5Note)
         let title = `${view.title}\n${goods.title}\n${height}x${width}`
-        let record = { stuff, view, goods, tech, height, width, count, note, title }
+        let record = { stuff, view, goods, height, width, count, note, title }
         let cost = Constructor.type5Calculate(record)
         return {  ...record, cost }
     }
@@ -1106,7 +1111,6 @@ Constructor.type5DataManage = async function(aRecord){
 Constructor.type6DataManage = async function(aRecord){
     if (aRecord) {
         // setter
-        console.log(aRecord)
         let { category, group, goods, count, note } = aRecord
         Helper.comboboxSetValue(Elements.type6Category, category.id)
         Helper.comboboxSetValue(Elements.type6Group, group.id)
@@ -1517,16 +1521,12 @@ Goods.getGoodsByGrouping = function(grouping){
 Goods.getGoodsByIndex = function(name, value){
     return Goods.indexes[name]?.[value]
 }
-
-
-
 Goods.downloadCache = async function(){
     let buffer = await BX.fileDownload( App.config.property.cacheFile.ID )
 
     let data = new TextDecoder('utf-8').decode(buffer)
     return JSON.parse(data)
 }
-
 Goods.updateCache = async function(aCache){
     let content = btoa(JSON.stringify(aCache))
     let result = await BX.fileUpdate(App.config.property.cacheFile.ID, content)
@@ -1535,37 +1535,20 @@ Goods.updateCache = async function(aCache){
     }
     return false
 }
-
-
-
 Goods.setCache = async function(aGoods){
     return await Goods.updateCache(aGoods)
 }
-
 Goods.getCache = async function(){
     return await Goods.downloadCache()
 }
-
 Goods.updateCacheTEST = async function(){
     let goods = await CRM.getProducts()
     return await Goods.setCache(goods)
 }
-
 Goods.initialize = async function(){
     let cache = await Goods.getCache()
     await Goods.indexing(cache)
 }
-
-
-
-
-
-
-
-
-
-
-
 
 const WHOLE = window.WHOLE = {
     App, BX, Helper, Renders, CRM, Goods, FrameDeal, Deal, Builder:Constructor, Elements, Enums
