@@ -20,32 +20,33 @@ $('.ui .menu .item').on('click', function() {
 
 const type5StuffChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    await Helper.comboboxClearItems(Elements.type5View)
+    await Helper.comboboxClearItems(Elements.type5Goods)
     await Helper.comboboxSetItems(Elements.type5View, await Goods.getGoodsByFilterDGrouping('type5View', item?.group))
     await Helper.comboboxSetValue(Elements.type5View, Constructor.currentRecord?.view?.id)
 }
 
 const type5ViewChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    await Helper.comboboxClearItems(Elements.type5Goods)
     await Helper.comboboxSetItems(Elements.type5Goods, await Goods.getGoodsByFilterDGrouping('type5Goods', item?.group))
     await Helper.comboboxSetValue(Elements.type5Goods, Constructor.currentRecord?.goods?.id)
 }
 
 const type6CategoryChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    await Helper.comboboxClearItems(Elements.type6Group)
+    await Helper.comboboxClearItems(Elements.type6Goods)
     await Helper.comboboxSetItems(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', item?.group))
     await Helper.comboboxSetValue(Elements.type6Group, Constructor.currentRecord?.group?.id)
 }
 
 const type6GroupChange = async function(value, text){
     let item = await Goods.getGoodsById(value)
+    await Helper.comboboxClearItems(Elements.type6Goods)
     await Helper.comboboxSetItems(Elements.type6Goods, await Goods.getGoodsByFilterDGrouping('type6Goods', item?.group))
     await Helper.comboboxSetValue(Elements.type6Goods, Constructor.currentRecord?.goods?.id)
 }
-
-
-
-
-
 
 // App
 const App = {}
@@ -205,13 +206,16 @@ Helper.recordTableDeals = function(item){
     let note = ''
     return { id, date, title, cost, note }
 }
-Helper.inputGetValue = function(aElement){
+Helper.inputGetValue = async function(aElement){
     return aElement.val()
 }
-Helper.inputSetValue = function(aElement, aValue){
+Helper.inputSetValue = async function(aElement, aValue){
     aElement.val(aValue)
 }
-Helper.comboboxGetValue = function(aElement){
+Helper.inputClearValue = async function(aElement){
+    aElement.empty()
+}
+Helper.comboboxGetValue = async function(aElement){
     return aElement.find('.active').attr('data-value')
 }
 Helper.comboboxSetValue = async function(aElement, aValue){
@@ -224,8 +228,10 @@ Helper.comboboxSetItems = async function(aElement, aItems = []){
     }
     aElement.empty().html(items)
 }
-Helper.comboboxClear = function(){}
-Helper.listboxGetValue = function(aElement){
+Helper.comboboxClearItems = async function(aElement){
+    aElement.empty().parent().find('.text').empty()
+}
+Helper.listboxGetValue = async function(aElement){
     return aElement.find('.active').attr('data-value')
 }
 Helper.listboxSetValue = async function(aElement, aValue){
@@ -238,7 +244,21 @@ Helper.listboxSetItems = async function(aElement, aItems = []){
     }
     aElement.empty().html(items)
 }
-Helper.listboxClear = function(){}
+Helper.listboxClearItems = async function(aElement){
+    aElement.empty()
+}
+Helper.listboxClearValue= async function(aElement){
+    //aElement.empty()
+}
+Helper.tablerGetValue = async function(aElement){
+
+}
+Helper.tablerSetValue = async function(aElement, aValue){
+
+}
+Helper.tablerClearValue = async function(aElement){
+    // unselect
+}
 
 // USER
 
@@ -1016,7 +1036,6 @@ Constructor.setRecord = async function(aRecord){
     if (typeof handler !== 'function') {
         return null
     }
-    console.log('setRecord', aRecord)
     await handler(aRecord)
     
 }
@@ -1068,14 +1087,14 @@ Constructor.type4DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { goods, count, note } = aRecord
-        Helper.listboxSetValue(Elements.type4Goods, goods.id)
-        Helper.inputSetValue(Elements.type4Count, count)
-        Helper.inputSetValue(Elements.type4Note, note)
+        await Helper.listboxSetValue(Elements.type4Goods, goods.id)
+        await Helper.inputSetValue(Elements.type4Count, count)
+        await Helper.inputSetValue(Elements.type4Note, note)
     } else {
         // getter
-        let goods = await Goods.getGoodsById(Helper.listboxGetValue(Elements.type4Goods))
-        let count = Helper.inputGetValue(Elements.type4Count)
-        let note = Helper.inputGetValue(Elements.type4Note)
+        let goods = await Goods.getGoodsById(await Helper.listboxGetValue(Elements.type4Goods))
+        let count = await Helper.inputGetValue(Elements.type4Count)
+        let note = await Helper.inputGetValue(Elements.type4Note)
         let title = `${goods.title}`
         let record = { goods, count, note, title }
         let cost = Constructor.type4Calculate(record)
@@ -1086,22 +1105,22 @@ Constructor.type5DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { stuff, view, goods, height, width, count, note } = aRecord
-        Helper.comboboxSetValue(Elements.type5Stuff, stuff.id)
-        Helper.comboboxSetValue(Elements.type5View, view.id)
-        Helper.comboboxSetValue(Elements.type5Goods, goods.id)
-        Helper.inputSetValue(Elements.type5Height, height)
-        Helper.inputSetValue(Elements.type5Width, width)
-        Helper.inputSetValue(Elements.type5Count, count)
-        Helper.inputSetValue(Elements.type5Note, note)
+        await Helper.comboboxSetValue(Elements.type5Stuff, stuff.id)
+        await Helper.comboboxSetValue(Elements.type5View, view.id)
+        await Helper.comboboxSetValue(Elements.type5Goods, goods.id)
+        await Helper.inputSetValue(Elements.type5Height, height)
+        await Helper.inputSetValue(Elements.type5Width, width)
+        await Helper.inputSetValue(Elements.type5Count, count)
+        await Helper.inputSetValue(Elements.type5Note, note)
     } else {
         // getter
-        let stuff = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Stuff))
-        let view = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5View))
-        let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type5Goods))
-        let height = Helper.inputGetValue(Elements.type5Height)
-        let width = Helper.inputGetValue(Elements.type5Width)
-        let count = Helper.inputGetValue(Elements.type5Count)
-        let note = Helper.inputGetValue(Elements.type5Note)
+        let stuff = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type5Stuff))
+        let view = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type5View))
+        let goods = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type5Goods))
+        let height = await Helper.inputGetValue(Elements.type5Height)
+        let width = await Helper.inputGetValue(Elements.type5Width)
+        let count = await Helper.inputGetValue(Elements.type5Count)
+        let note = await Helper.inputGetValue(Elements.type5Note)
         let title = `${view.title}\n${goods.title}\n${height}x${width}`
         let record = { stuff, view, goods, height, width, count, note, title }
         let cost = Constructor.type5Calculate(record)
@@ -1112,18 +1131,18 @@ Constructor.type6DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { category, group, goods, count, note } = aRecord
-        Helper.comboboxSetValue(Elements.type6Category, category.id)
-        Helper.comboboxSetValue(Elements.type6Group, group.id)
-        Helper.comboboxSetValue(Elements.type6Goods, goods.id)
-        Helper.inputSetValue(Elements.type6Count, count)
-        Helper.inputSetValue(Elements.type6Note, note)
+        await Helper.comboboxSetValue(Elements.type6Category, category.id)
+        await Helper.comboboxSetValue(Elements.type6Group, group.id)
+        await Helper.comboboxSetValue(Elements.type6Goods, goods.id)
+        await Helper.inputSetValue(Elements.type6Count, count)
+        await Helper.inputSetValue(Elements.type6Note, note)
     } else {
         // getter
-        let category = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Category))
-        let group = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Group))
-        let goods = await Goods.getGoodsById(Helper.comboboxGetValue(Elements.type6Goods))
-        let count = Helper.inputGetValue(Elements.type6Count)
-        let note = Helper.inputGetValue(Elements.type6Note)
+        let category = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Category))
+        let group = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Group))
+        let goods = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Goods))
+        let count = await Helper.inputGetValue(Elements.type6Count)
+        let note = await Helper.inputGetValue(Elements.type6Note)
         let title = `${group.title}\n${goods.title}`
         let record = { category, group, goods, count, note, title }
         let cost = Constructor.type6Calculate(record)
@@ -1135,18 +1154,18 @@ Constructor.type7DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { seller, article, price, count, note } = aRecord
-        Helper.inputSetValue(Elements.type7Seller, seller)
-        Helper.inputSetValue(Elements.type7Article, article)
-        Helper.inputSetValue(Elements.type7Price, price)
-        Helper.inputSetValue(Elements.type7Count, count)
-        Helper.inputSetValue(Elements.type7Note, note)
+        await Helper.inputSetValue(Elements.type7Seller, seller)
+        await Helper.inputSetValue(Elements.type7Article, article)
+        await Helper.inputSetValue(Elements.type7Price, price)
+        await Helper.inputSetValue(Elements.type7Count, count)
+        await Helper.inputSetValue(Elements.type7Note, note)
     } else {
         // getter
-        let seller = Helper.inputGetValue(Elements.type7Seller)
-        let article = Helper.inputGetValue(Elements.type7Article)
-        let price = Helper.inputGetValue(Elements.type7Price)
-        let count = Helper.inputGetValue(Elements.type7Count)
-        let note = Helper.inputGetValue(Elements.type7Note)
+        let seller = await Helper.inputGetValue(Elements.type7Seller)
+        let article = await Helper.inputGetValue(Elements.type7Article)
+        let price = await Helper.inputGetValue(Elements.type7Price)
+        let count = await Helper.inputGetValue(Elements.type7Count)
+        let note = await Helper.inputGetValue(Elements.type7Note)
         let title = `${seller}\n${article}`
         let record = { seller, article, price, count, note, title }
         let cost = Constructor.type7Calculate(record)
@@ -1182,6 +1201,54 @@ Constructor.type7Calculate = function(record){
     let { count, price } = record
     return ( Number(price) * Number(count) )
 }
+
+
+Constructor.type1Clear = async function(){
+
+}
+
+Constructor.type2Clear = async function(){
+
+}
+
+Constructor.type3Clear = async function(){
+
+}
+
+Constructor.type4Clear = async function(){
+    await Helper.listboxClearValue(Elements.type4Goods)
+    await Helper.inputClearValue(Elements.type4Count)
+    await Helper.inputClearValue(Elements.type4Note)
+}
+
+Constructor.type5Clear = async function(){
+    await Helper.comboboxClearValue(Elements.type5Stuff)
+    await Helper.comboboxClearValue(Elements.type5View)
+    await Helper.comboboxClearValue(Elements.type5Goods)
+    await Helper.inputClearValue(Elements.type5Height)
+    await Helper.inputClearValue(Elements.type5Width)
+    await Helper.inputClearValue(Elements.type5Count)
+    await Helper.inputClearValue(Elements.type5Note)
+}
+
+Constructor.type6Clear = async function(){
+    await Helper.comboboxClearValue(Elements.type6Category)
+    await Helper.comboboxClearValue(Elements.type6Group)
+    await Helper.comboboxClearValue(Elements.type6Goods)
+    await Helper.inputClearValue(Elements.type6Count)
+    await Helper.inputClearValue(Elements.type6Note)
+}
+
+Constructor.type7Clear = async function(){
+    await Helper.inputClearValue(Elements.type7Seller)
+    await Helper.inputClearValue(Elements.type7Article)
+    await Helper.inputClearValue(Elements.type7Price)
+    await Helper.inputClearValue(Elements.type7Count)
+    await Helper.inputClearValue(Elements.type7Note)
+}
+
+
+
 
 // LIST_CONSTRUCTORS
 const listConstructorsClick = async function(event){
