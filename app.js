@@ -119,24 +119,24 @@ App.initialize = async function(){
     //$('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
     $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
     
-    Helper.tablerOnTabChange(Elements.type6TablerCategory, async function(event){
-        console.log('tabler on change handler', event)
-        // заполнить данные зависимых контролов
-        // выбрать 0 элемент
-
+    Helper.tablerOnTabClick(Elements.type6TablerCategory, async function(event){
         await Helper.comboboxClearItems(Elements.type6Goods)
-
         let { value } = event
         await Helper.selectItemsClear(Elements.type6Group)
         await Helper.selectItemsSet(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', value))
         await Helper.selectSetActiveItemByValue(Elements.type6Group, Constructor.currentRecord?.group?.id)
     })
 
-
-
-
     Helper.tablerSetActiveTabByValue(Elements.type6TablerCategory)
 
+    Elements.type6Goods.on('click', function(event){
+        let element = $(event.target)
+        let activeRow = element.parent().find('.active')
+        if (activeRow) {
+            activeRow.removeClass('active')
+        }
+        element.addClass('active')
+    })
 
 
 
@@ -286,18 +286,16 @@ Helper.tablerGetActiveTabValue = async function(aElement){
     return aElement.children('.item').attr('data-tab')
 }
 Helper.tablerSetActiveTabByValue = async function(aElement, aName){
-    aElement.find('active').removeClass('.active')
+    aElement.find('active').removeClass('active')
     if (aName) {
-        aElement.find(`[data-tab="${aName}"]`).addClass('.active').click()
-        console.log('event set active item true value')
+        console.log('set active tab name', aName)
+        aElement.find(`[data-tab="${aName}"]`).addClass('active').click()
     } else {
-        console.log('event set active item false value')
-        aElement.children('.item:first-child').addClass('.active').click()
+        aElement.children('.item:first-child').addClass('active').click()
     }
 }
-Helper.tablerOnTabChange = async function(aElement, aHandler){
+Helper.tablerOnTabClick = async function(aElement, aHandler){
     aElement.children('.item').on('click', function(event){
-        console.log('event on change tab')
         let tab = $(event.target)
         let value = tab.attr('data-tab')
         aHandler({ tab, value })
@@ -308,13 +306,11 @@ Helper.selectGetActiveItemValue = async function(aElement){
     return aElement.children('.item').attr('data-value')
 }
 Helper.selectSetActiveItemByValue = async function(aElement, aValue){
-    aElement.find('active').removeClass('.active')
+    aElement.find('active').removeClass('active')
     if (aValue) {
-        aElement.find(`[data-tab="${aValue}"]`).addClass('.active').click()
-        console.log('event set active item true value')
+        aElement.find(`[data-tab="${aValue}"]`).addClass('active').click()
     } else {
-        console.log('event set active item false value')
-        aElement.find(`[data-tab="${aValue}"]`).addClass('.active').click()
+        aElement.find(`[data-tab="${aValue}"]`).addClass('active').click()
     }
 }
 Helper.selectItemsClear = async function(aElement, aItems){
@@ -1201,16 +1197,17 @@ Constructor.type6DataManage = async function(aRecord){
     if (aRecord) {
         // setter
         let { category, group, goods, count, note } = aRecord
-        await Helper.comboboxSetValue(Elements.type6Category, category.id)
-        await Helper.comboboxSetValue(Elements.type6Group, group.id)
-        await Helper.comboboxSetValue(Elements.type6Goods, goods.id)
+        await Helper.tablerSetActiveTabByValue(Elements.type6TablerCategory, category?.group)
+        await Helper.selectSetActiveItemByValue(Elements.type6Group, group?.id)
+        await Helper.listboxSetValue(Elements.type6Goods, goods.id)
         await Helper.inputSetValue(Elements.type6Count, count)
         await Helper.inputSetValue(Elements.type6Note, note)
     } else {
         // getter
-        let category = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Category))
-        let group = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Group))
-        let goods = await Goods.getGoodsById(await Helper.comboboxGetValue(Elements.type6Goods))
+        
+        let group = await Goods.getGoodsById(await Helper.selectGetActiveItemValue(Elements.type6Group))
+        let goods = await Goods.getGoodsById(await Helper.selectGetActiveItemValue(Elements.type6Goods))
+        let category = (await Goods.getGoodsByFilterDGroup('type6Category', await Helper.tablerGetActiveTabValue(Elements.type6TablerCategory)))[0]
         let count = await Helper.inputGetValue(Elements.type6Count)
         let note = await Helper.inputGetValue(Elements.type6Note)
         let title = `${group.title}\n${goods.title}`
@@ -1521,7 +1518,8 @@ Goods.exportIndexes = async function(aIndexes){
 
 }
 
-Goods.indexing = async function(items){
+Goods.indexing = async function(items, theCache){
+    console.log('indexing', theCache)
 
     let idIndex = Goods.indexes['id'] || ( Goods.indexes['id'] = {} )
     let destinationIndex = Goods.indexes['destination'] || ( Goods.indexes['destination'] = {} )
@@ -1535,13 +1533,13 @@ Goods.indexing = async function(items){
         items = [items]
     }
 
-
     for (let item of items) {
-
         let record = Helper.recordCRMProduct(item)
 
         if (idIndex[record.id]) {
-            return
+            console.warn('BUG !!!')
+            //console.log('indexing item return', item, record)
+            //return
         }
 
         idIndex[record.id] = record
@@ -1622,7 +1620,6 @@ Goods.getGoodsByFilterDGrouping = async function(aDestination, aGrouping){
             goods = Goods.getGoodsByIndex('destination.grouping', `${aDestination}.${aGrouping}`)
         }
     }
-    console.log('goods', goods)
     return goods || []
 }
 Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
@@ -1685,7 +1682,7 @@ Goods.updateCacheTEST = async function(){
 }
 Goods.initialize = async function(){
     let cache = await Goods.getCache()
-    await Goods.indexing(cache)
+    await Goods.indexing(cache, true)
 }
 
 const WHOLE = window.WHOLE = {
