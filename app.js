@@ -116,9 +116,30 @@ App.initialize = async function(){
     $('#constructorType5').find('.controlStuff').parent().dropdown({ duration:0, onChange:type5StuffChange })
     $('#constructorType5').find('.controlView').parent().dropdown({ duration:0, onChange:type5ViewChange })
 
-    $('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
+    //$('#constructorType6').find('.controlCategory').parent().dropdown({ duration:0, onChange:type6CategoryChange })
     $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
     
+    Helper.tablerOnTabChange(Elements.type6TablerCategory, async function(event){
+        console.log('tabler on change handler', event)
+        // заполнить данные зависимых контролов
+        // выбрать 0 элемент
+
+        await Helper.comboboxClearItems(Elements.type6Goods)
+
+        let { value } = event
+        await Helper.selectItemsClear(Elements.type6Group)
+        await Helper.selectItemsSet(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', value))
+        await Helper.selectSetActiveItemByValue(Elements.type6Group, Constructor.currentRecord?.group?.id)
+    })
+
+
+
+
+    Helper.tablerSetActiveTabByValue(Elements.type6TablerCategory)
+
+
+
+
     
 
     $('.vclInputFilter').on('input', function(event){
@@ -250,6 +271,7 @@ Helper.listboxClearItems = async function(aElement){
 Helper.listboxClearValue= async function(aElement){
     //aElement.empty()
 }
+
 Helper.tablerGetValue = async function(aElement){
 
 }
@@ -258,6 +280,53 @@ Helper.tablerSetValue = async function(aElement, aValue){
 }
 Helper.tablerClearValue = async function(aElement){
     // unselect
+}
+
+Helper.tablerGetActiveTabValue = async function(aElement){
+    return aElement.children('.item').attr('data-tab')
+}
+Helper.tablerSetActiveTabByValue = async function(aElement, aName){
+    aElement.find('active').removeClass('.active')
+    if (aName) {
+        aElement.find(`[data-tab="${aName}"]`).addClass('.active').click()
+        console.log('event set active item true value')
+    } else {
+        console.log('event set active item false value')
+        aElement.children('.item:first-child').addClass('.active').click()
+    }
+}
+Helper.tablerOnTabChange = async function(aElement, aHandler){
+    aElement.children('.item').on('click', function(event){
+        console.log('event on change tab')
+        let tab = $(event.target)
+        let value = tab.attr('data-tab')
+        aHandler({ tab, value })
+    })
+}
+
+Helper.selectGetActiveItemValue = async function(aElement){
+    return aElement.children('.item').attr('data-value')
+}
+Helper.selectSetActiveItemByValue = async function(aElement, aValue){
+    aElement.find('active').removeClass('.active')
+    if (aValue) {
+        aElement.find(`[data-tab="${aValue}"]`).addClass('.active').click()
+        console.log('event set active item true value')
+    } else {
+        console.log('event set active item false value')
+        aElement.find(`[data-tab="${aValue}"]`).addClass('.active').click()
+    }
+}
+Helper.selectItemsClear = async function(aElement, aItems){
+
+    aElement.empty().siblings('.text').empty()
+}
+Helper.selectItemsSet = async function(aElement, aItems){
+    let items = ''
+    for (let item of aItems) {
+        items += `<div class="item" data-value=${item.id}>${item.title}</div>`
+    }
+    aElement.empty().html(items)
 }
 
 // USER
@@ -670,7 +739,7 @@ Elements.type6Constructor = $('#constructorType6')
 Elements.type6TablerCategory = Elements.type6Constructor.find('.controlTabler')
 Elements.type6Category = Elements.type6Constructor.find('.controlCategory')
 Elements.type6CategoryControl = Elements.type6Category.parent()
-Elements.type6Group = Elements.type6Constructor.find('.controlGroup')
+Elements.type6Group = Elements.type6Constructor.find('.controlSelectGroup > .controlGroup')
 Elements.type6GroupControl = Elements.type6Group.parent()
 Elements.type6Goods = Elements.type6Constructor.find('.controlGoods')
 Elements.type6GoodsControl = Elements.type6Goods.parent()
@@ -1553,6 +1622,7 @@ Goods.getGoodsByFilterDGrouping = async function(aDestination, aGrouping){
             goods = Goods.getGoodsByIndex('destination.grouping', `${aDestination}.${aGrouping}`)
         }
     }
+    console.log('goods', goods)
     return goods || []
 }
 Goods.getGoodsByFilterDGG = async function(aDestination, aGroup, aGrouping){
