@@ -254,7 +254,7 @@ Helper.tablerGetValue = async function(aElement){
 
 }
 Helper.tablerSetValue = async function(aElement, aValue){
-
+    aElement.find(`[data-tab="${aValue}"]`).click()
 }
 Helper.tablerClearValue = async function(aElement){
     // unselect
@@ -667,6 +667,7 @@ Elements.type5Count = Elements.type5Constructor.find('.controlCount')
 Elements.type5Note = Elements.type5Constructor.find('.controlNote')
 
 Elements.type6Constructor = $('#constructorType6')
+Elements.type6TablerCategory = Elements.type6Constructor.find('.controlTabler')
 Elements.type6Category = Elements.type6Constructor.find('.controlCategory')
 Elements.type6CategoryControl = Elements.type6Category.parent()
 Elements.type6Group = Elements.type6Constructor.find('.controlGroup')

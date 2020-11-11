@@ -1,0 +1,184 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+    margin: 0px;
+    padding: 0px;
+    font-size: 12px;
+}
+
+html, body, div, button{
+    box-sizing: border-box !important;
+}
+
+.modal{
+    border-radius: 0px !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0px !important;
+}
+
+.modals{
+    margin: 0px !important;
+    padding: 0px !important;
+    overflow: hidden !important;
+}
+
+.button{
+    border: 1px solid gray !important;
+}
+
+#app{
+    position: absolute;
+    margin: 0px;
+    padding: 5px;
+    overflow: hidden;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+.wrapperTabPage{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: 41px;
+    bottom: 5px;
+}
+
+.tabPage{
+    flex: 1;
+    border: 1px solid silver;
+    padding: 5px;
+}
+
+.scroll{
+    overflow: auto;
+}
+
+#tableDeals{
+    cursor: pointer;
+}
+
+#frameDeal{
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 5px !important;
+}
+
+#controlDataDeal{
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 5px !important;
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+#controlColumnTable{
+    flex: 1;
+}
+
+.padding5px{
+    padding: 5px !important;
+}
+
+.segment{
+    padding: 5px !important;
+}
+
+.hide{
+    display: none !important;
+}
+
+#tabFlex{
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.tabMultiline{
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.tabMultiline > .item {
+    border-top: 1px solid silver !important;
+    border-left: 1px solid silver !important;
+    border-right: 1px solid silver !important;
+    border-bottom: 1px solid silver !important;
+    border-radius: 1px !important;
+    margin: 1px !important;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.dealCostFooter{
+    position: absolute !important;
+    font-weight: bold !important;
+    left: 0px !important;
+    bottom: 5px !important;
+    right: 0px !important;
+    height: 30px !important;
+    margin: 5px !important;
+}
+
+#btnRemoveSelectDealItem{
+    width: 25px;
+}
+
+
+#HIDDEN_CONTROLS{
+    display: none !important;
+    position: absolute !important;
+}
+
+#btnRemoveSelectDealItem{
+    max-width: 25px !important;
+    max-height: 25px !important;
+}
+
+.vclRowInputFilter{
+    display: flex;
+}
+.vclContainerInputFilter{
+    margin: auto !important;
+}
+.vclInputFilter{
+    min-width: 350px;
+}
+
+.listConstructors{
+    min-width: 220px !important;
+    max-width: 220px !important;
+}
+
+#constructor{
+    min-width: 800px !important;
+    max-width: 800px !important;
+}
+
+.tableDealItems {
+    min-width: 400px !important;
+}
+
+.noMargin{
+    margin: 0px !important;
+}
+
+.noPadding{
+    margin: 0px !important;
+}
+
+.noScrollHor{
+    overflow-x: hidden !important;
+}
+
+.noScrollVer{
+    overflow-y: hidden !important;
+}
