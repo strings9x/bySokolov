@@ -120,8 +120,8 @@ App.initialize = async function(){
     $('#constructorType6').find('.controlGroup').parent().dropdown({ duration:0, onChange:type6GroupChange })
     
     Helper.tablerOnTabClick(Elements.type6TablerCategory, async function(event){
-        await Helper.comboboxClearItems(Elements.type6Goods)
         let { value } = event
+        await Helper.listboxClearItems(Elements.type6Goods)
         await Helper.selectItemsClear(Elements.type6Group)
         await Helper.selectItemsSet(Elements.type6Group, await Goods.getGoodsByFilterDGrouping('type6Group', value))
         await Helper.selectSetActiveItemByValue(Elements.type6Group, Constructor.currentRecord?.group?.id)
@@ -283,15 +283,14 @@ Helper.tablerClearValue = async function(aElement){
 }
 
 Helper.tablerGetActiveTabValue = async function(aElement){
-    return aElement.children('.item').attr('data-tab')
+    return aElement.find('.active').attr('data-tab')
 }
-Helper.tablerSetActiveTabByValue = async function(aElement, aName){
+Helper.tablerSetActiveTabByValue = async function(aElement, aValue){
     aElement.find('active').removeClass('active')
-    if (aName) {
-        console.log('set active tab name', aName)
-        aElement.find(`[data-tab="${aName}"]`).addClass('active').click()
+    if (aValue) {
+        aElement.find(`[data-tab="${aValue}"]`).click()
     } else {
-        aElement.children('.item:first-child').addClass('active').click()
+        aElement.children('.item:first-child').click()
     }
 }
 Helper.tablerOnTabClick = async function(aElement, aHandler){
@@ -303,18 +302,17 @@ Helper.tablerOnTabClick = async function(aElement, aHandler){
 }
 
 Helper.selectGetActiveItemValue = async function(aElement){
-    return aElement.children('.item').attr('data-value')
+    return aElement.find('.active').attr('data-value')
 }
 Helper.selectSetActiveItemByValue = async function(aElement, aValue){
     aElement.find('active').removeClass('active')
     if (aValue) {
-        aElement.find(`[data-tab="${aValue}"]`).addClass('active').click()
+        aElement.find(`[data-value="${aValue}"]`).click()
     } else {
-        aElement.find(`[data-tab="${aValue}"]`).addClass('active').click()
+        aElement.find(`[data-value="${aValue}"]`).click()
     }
 }
-Helper.selectItemsClear = async function(aElement, aItems){
-
+Helper.selectItemsClear = async function(aElement){
     aElement.empty().siblings('.text').empty()
 }
 Helper.selectItemsSet = async function(aElement, aItems){
@@ -1061,14 +1059,14 @@ let Constructor = {}
 Constructor.currentRecord = null
 Constructor.currentType = ''
 Constructor.element = $('#constructor')
-Constructor.visible = function(args){
+Constructor.visible = function(args, reShow){
 
     let { type } = args
 
     if (this.currentType === type) {
-        this.element.addClass('hide')
-        this.element.find(`#${this.currentType}`).addClass('hide')    
-        this.currentType = ''
+        // this.element.addClass('hide')
+        // this.element.find(`#${this.currentType}`).addClass('hide')    
+        // this.currentType = ''
         return
     }
 
@@ -1097,12 +1095,13 @@ Constructor.setRecord = async function(aRecord){
     Constructor.currentRecord = aRecord
     let { type } = aRecord
     type = type.replace('t', 'constructorT')
-    Constructor.visible({ type })
+    
     let handler = Constructor[`${aRecord.type}DataManage`]
     if (typeof handler !== 'function') {
         return null
     }
     await handler(aRecord)
+    Constructor.visible({ type }, false)
     
 }
 
@@ -1204,7 +1203,6 @@ Constructor.type6DataManage = async function(aRecord){
         await Helper.inputSetValue(Elements.type6Note, note)
     } else {
         // getter
-        
         let group = await Goods.getGoodsById(await Helper.selectGetActiveItemValue(Elements.type6Group))
         let goods = await Goods.getGoodsById(await Helper.selectGetActiveItemValue(Elements.type6Goods))
         let category = (await Goods.getGoodsByFilterDGroup('type6Category', await Helper.tablerGetActiveTabValue(Elements.type6TablerCategory)))[0]
@@ -1519,7 +1517,6 @@ Goods.exportIndexes = async function(aIndexes){
 }
 
 Goods.indexing = async function(items, theCache){
-    console.log('indexing', theCache)
 
     let idIndex = Goods.indexes['id'] || ( Goods.indexes['id'] = {} )
     let destinationIndex = Goods.indexes['destination'] || ( Goods.indexes['destination'] = {} )
